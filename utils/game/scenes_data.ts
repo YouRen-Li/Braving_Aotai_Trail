@@ -16,6 +16,7 @@ export interface Scene {
   text: string;
   choices: SceneChoice[];
   bg?: string;
+  type?: "normal" | "loot" | "event"; // [NEW] Added for clearer logic classification if needed
 }
 
 // --- 真实地图节点扩充版 ---
@@ -30,12 +31,12 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "坐秀才家的拖拉机上山",
         target: "node_village_road",
-        cost: { hp: -2 },
+        cost: { hp: 0, hunger: 0 }, // Free ride
       },
       {
         text: "徒步前往登山口",
         target: "node_village_road",
-        cost: { hunger: 5, hp: 5 },
+        cost: { hunger: 2, hp: 0 }, // Reduced cost
       },
     ],
   },
@@ -48,12 +49,12 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "加快脚步热身",
         target: "node_river_crossing",
-        cost: { hunger: 5 },
+        cost: { hunger: 2 }, // Reduced
       },
       {
         text: "检查背包",
         target: "node_river_crossing",
-        cost: { hunger: 2 },
+        cost: { hunger: 1 }, // Reduced
       },
     ],
   },
@@ -66,12 +67,12 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "踩着石头跳过去",
         target: "node_forest_entry",
-        cost: { hunger: 5, sanity: 2 },
+        cost: { hunger: 3, sanity: 2 }, // Reduced hunger
       },
       {
         text: "脱鞋涉水",
         target: "node_forest_entry",
-        cost: { hp: 5, hunger: 5 },
+        cost: { hp: 2, hunger: 2 }, // Reduced
       },
     ],
   },
@@ -84,13 +85,13 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "保持节奏爬升",
         target: "node_forest_climb",
-        cost: { hunger: 10, hp: 2 },
+        cost: { hunger: 5, hp: 2 }, // Reduced from 10
       },
       {
         text: "回头看一眼山下的村庄",
         action: "look_back",
         target: "node_forest_climb",
-        cost: { hunger: 5, sanity: -5 },
+        cost: { hunger: 3, sanity: -5 }, // Reduced from 5
       },
     ],
   },
@@ -114,7 +115,11 @@ const mapScenes: Record<string, Scene> = {
     text: "2900营地。通常早上出发的人中午就到这了，只有下午上山的才在此扎营。再往上走一点看到歪脖子树，就快到山脊线了。",
     bg: "loc_sunset_meadow",
     choices: [
-      { text: "搭帐篷过夜", action: "rest", target: "node_2900_morning" },
+      {
+        text: "搭帐篷过夜 (可能发现前人留下的物资)",
+        action: "rest",
+        target: "node_2900_morning",
+      },
       { text: "感觉状态不对，决定下撤", target: "end_retreat" },
     ],
   },
@@ -144,19 +149,33 @@ const mapScenes: Record<string, Scene> = {
 
   node_penjing: {
     id: "node_penjing",
-    text: "鳌太山脊在这里拐了个大弯，向东延伸，那里是西跑马梁。这里有信号，可以给家人报个平安。",
+    text: "鳌太山脊在这里拐了个大弯。这里有信号，可以给家人报个平安。下方深沟里似乎隐约有水源的反光。",
     bg: "loc_penjing",
     choices: [
       { text: "给家人打电话", action: "rest", target: "node_baiqi_start" },
       {
-        text: "下沟取水",
-        action: "loot_supplies",
-        cost: { hunger: 5, hp: 5 },
+        text: "下沟取水 (耗时，获得物资)",
+        target: "node_penjing_gully", // Detour
+        cost: { hunger: 5 },
       },
       {
         text: "继续赶路",
         target: "node_baiqi_start",
-        cost: { hunger: 20, hp: 10 },
+        cost: { hunger: 15, hp: 5 }, // Reduced hunger 20->15
+      },
+    ],
+  },
+
+  node_penjing_gully: {
+    id: "node_penjing_gully",
+    text: "你艰难地下到深沟，果然发现了一处水源，旁边还有一些驴友遗弃的气罐和食物。",
+    bg: "loc_spring_water",
+    choices: [
+      {
+        text: "搜刮物资并返回值路",
+        action: "loot_supplies",
+        target: "node_baiqi_start",
+        cost: { hunger: 10, hp: 5 }, // Cost for the climb back
       },
     ],
   },
@@ -292,7 +311,12 @@ const mapScenes: Record<string, Scene> = {
     text: "爬上飞机梁，你看到了一些战机残骸和遇难山友的纪念碑。接下来要连续过三个梁。这是挑战心理的一段路。",
     bg: "loc_plane_wreck",
     choices: [
-      { text: "查看残骸与纪念碑", target: "node_liang1", cost: { sanity: 5 } },
+      {
+        text: "查看残骸与纪念碑 (可能发现物资)",
+        target: "node_liang1",
+        cost: { sanity: 5 },
+        action: "loot_supplies", // Added chance for loot
+      },
       { text: "不看，直接前往梁1", target: "node_liang1" },
     ],
   },

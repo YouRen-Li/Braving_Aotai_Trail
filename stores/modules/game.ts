@@ -446,11 +446,11 @@ export const useGameStore = defineStore("game", {
             return; // Cannot rest if starving
           }
 
-          this.status.hunger = Math.max(0, this.status.hunger - 25);
+          this.status.hunger = Math.max(0, this.status.hunger - 20); // Reduced from 25
 
-          let heal = 30;
-          if (this.weather === "storm") heal = 10;
-          if (this.weather === "sunny") heal = 50;
+          let heal = 40; // Increased base from 30
+          if (this.weather === "storm") heal = 15; // Slightly better storm rest
+          if (this.weather === "sunny") heal = 60; // Better sunny rest
 
           // [MORAL DILEMMA] Cursed Items check
           // If player has 'relic_watch' (Dead man's watch), resting is less effective/painful
@@ -481,7 +481,7 @@ export const useGameStore = defineStore("game", {
 
           if (!hasCursedItem) {
             uni.showToast({
-              title: `休息一晚 (生命+${heal}, 饱食-25)`,
+              title: `休息一晚 (生命+${heal}, 饱食-20)`,
               icon: "none",
             });
           }
