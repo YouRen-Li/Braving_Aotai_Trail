@@ -122,6 +122,9 @@ onShow(() => {
     // Check if save exists in storage
     const saved = uni.getStorageSync('braving_aotai_save_v1');
     hasSave.value = !!(saved && saved.currentSceneId);
+
+    // Sync music state (in case it changed elsewhere)
+    isMusicOn.value = audioManager.isMusicOn;
 });
 
 const handleStartHike = () => {

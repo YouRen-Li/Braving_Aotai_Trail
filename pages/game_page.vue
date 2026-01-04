@@ -159,8 +159,10 @@ const corruptedChoiceText = (text) => {
 const { displayedText, isTyping, start, skip } = useTypewriter();
 
 // 监听剧情变化，重新播放打字机
-watch(() => currentScene.value.id, (newId) => {
-  start(currentScene.value.text);
+watch(() => currentScene.value?.id, (newId) => {
+  if (currentScene.value?.text) {
+    start(currentScene.value.text);
+  }
 }, { immediate: true });
 
 // 监听HP变化，触发受伤特效
@@ -191,22 +193,7 @@ const onChoose = (choice) => {
   gameStore.handleChoice(choice);
 };
 
-const formatCost = (cost) => {
-  let text = '';
-  // Cost > 0 means loss (e.g. cost: { hp: 5 } -> -5 HP)
-  // Cost < 0 means gain (e.g. cost: { hunger: -10 } -> +10 Hunger)
 
-  if (cost.hp) {
-    text += `(${cost.hp > 0 ? '-' : '+'}${Math.abs(cost.hp)}生命) `;
-  }
-  if (cost.hunger) {
-    text += `(${cost.hunger > 0 ? '-' : '+'}${Math.abs(cost.hunger)}饱食) `;
-  }
-  if (cost.sanity) {
-    text += `(${cost.sanity > 0 ? '-' : '+'}${Math.abs(cost.sanity)}理智) `;
-  }
-  return text;
-};
 
 // ... (Rest of logic)
 </script>
@@ -364,10 +351,7 @@ page {
   }
 }
 
-.cost-hint {
-  font-size: 24rpx;
-  color: #ff6b6b; // Reddish for costs
-}
+
 
 .night-warning {
   text-align: center;

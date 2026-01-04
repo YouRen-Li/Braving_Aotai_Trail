@@ -34,10 +34,8 @@
                         </view>
                     </view>
 
-                    <image v-if="index === currentIndex" class="stamp" src="/static/images/stamp_confidential.png"
-                        mode="widthFix"></image>
-                    <!-- Fallback if stamp image missing: CSS Stamp -->
-                    <view v-else class="css-stamp">CONFIDENTIAL</view>
+                    <!-- CSS Stamp for both states, easier to manage -->
+                    <view class="css-stamp" :class="{ 'stamp-active': index === currentIndex }">CONFIDENTIAL</view>
 
                     <view class="divider-line"></view>
 
@@ -98,6 +96,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
 import { roles } from '@/utils/data/roles_data';
 import { items } from '@/utils/data/items_data';
 import { useGameStore } from '@/stores/game';
@@ -113,6 +112,10 @@ onMounted(() => {
     if (roles.length > 0) {
         currentIndex.value = Math.floor(Math.random() * roles.length);
     }
+});
+
+onShow(() => {
+    isTransitioning.value = false;
 });
 
 const onSwiperChange = (e) => {
@@ -276,7 +279,10 @@ const confirmSelection = () => {
         box-shadow: 0 0 40rpx rgba(0, 0, 0, 0.9);
 
         .css-stamp {
-            opacity: 0.2;
+            &.stamp-active {
+                opacity: 1;
+                transform: translate(-50%, -50%) rotate(-15deg) scale(1.1);
+            }
         }
     }
 }

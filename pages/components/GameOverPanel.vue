@@ -101,7 +101,7 @@ const evaluationTitle = computed(() => {
 });
 
 const onRestart = () => {
-    uni.reLaunch({ url: '/pages/index/index' });
+    uni.reLaunch({ url: '/pages/home_page' });
 };
 </script>
 
