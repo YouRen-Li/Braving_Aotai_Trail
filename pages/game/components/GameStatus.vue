@@ -62,9 +62,11 @@ const weatherInfo = computed(() => gameStore.currentWeatherInfo);
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 30rpx;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10px);
-  border-bottom: 1rpx solid rgba(255, 255, 255, 0.1);
+  padding-top: calc(20rpx + var(--status-bar-height)); // Safe area support
+  padding-right: 140rpx; // Avoid overlap with Bag Button (top-right)
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%); // Gradient fade instead of hard block
+  backdrop-filter: none; // Remove blur for cleaner look on gradient
+  border-bottom: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -81,11 +83,12 @@ const weatherInfo = computed(() => gameStore.currentWeatherInfo);
 
 .day-indicator {
   .day-text {
-    font-size: 32rpx;
-    font-weight: 800;
+    font-size: 36rpx; // Larger
+    font-weight: 900;
     color: #fff;
     font-family: monospace;
     letter-spacing: 2rpx;
+    text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -95,21 +98,22 @@ const weatherInfo = computed(() => gameStore.currentWeatherInfo);
   gap: 8rpx;
 
   .weather-icon {
-    font-size: 24rpx;
+    font-size: 28rpx;
   }
 
   .weather-name {
-    font-size: 20rpx;
-    color: rgba(255, 255, 255, 0.8);
+    font-size: 24rpx;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.5);
   }
 }
 
 .bars-container {
   flex: 1;
-  margin-left: 30rpx;
+  margin: 0 40rpx;
   display: flex;
   flex-direction: column;
-  gap: 8rpx; // Reduced gap to fit 3 bars
+  gap: 12rpx;
 }
 
 .bar-row {
@@ -119,25 +123,29 @@ const weatherInfo = computed(() => gameStore.currentWeatherInfo);
 
   .icon {
     font-size: 24rpx;
-    color: #ccc;
-    width: 24rpx; // fixed width for alignment
+    color: #eee;
+    width: 30rpx;
     text-align: center;
+    text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.5);
   }
 
   .value {
-    font-size: 20rpx;
-    color: rgba(255, 255, 255, 0.7);
-    width: 40rpx;
+    font-size: 22rpx;
+    color: #fff;
+    width: 50rpx;
     text-align: right;
+    font-weight: bold;
+    text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.5);
   }
 }
 
 .progress-bg {
   flex: 1;
-  height: 10rpx; // Slightly thinner
-  background: rgba(255, 255, 255, 0.2);
+  height: 12rpx;
+  background: rgba(0, 0, 0, 0.5); // Darker background for contrast
   border-radius: 6rpx;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .progress-fill {

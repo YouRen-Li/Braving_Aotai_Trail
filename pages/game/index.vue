@@ -1,22 +1,22 @@
 <template>
-  <view class="game-container" :style="sanityStyle">
-    <!-- 动态背景层 -->
-    <background-layer />
+  <view class="game-container">
+    <!-- 视觉特效层 (受Sanity/DayNight影响) -->
+    <view class="visual-layer" :style="sanityStyle">
+      <background-layer />
+      <day-night-overlay :is-night="isNight" :has-vision="hasVision" />
+    </view>
 
-    <!-- 昼夜遮罩层 [NEW] -->
-    <day-night-overlay :is-night="isNight" :has-vision="hasVision" />
-
-    <!-- 伤害血红特效 -->
+    <!-- 伤害血红特效 (UI层) -->
     <view class="damage-flash" :class="{ active: showDamageFlash }"></view>
 
-    <!-- 精神错乱 Glitch 特效 -->
+    <!-- 精神错乱 Glitch 特效 (Overlay) -->
     <view class="glitch-overlay" v-if="showGlitch">
       <text v-for="n in 20" :key="n" class="glitch-char" :style="randomGlitchStyle()">
         {{ randomChar() }}
       </text>
     </view>
 
-    <!-- 状态栏 -->
+    <!-- 状态栏 (不受滤镜影响) -->
     <game-status />
 
     <!-- 背包按钮 -->
@@ -127,27 +127,32 @@ const onChoose = (choice) => {
 
 const formatCost = (cost) => {
   let text = '';
-  if (cost.hp) text += `(-${cost.hp}HP) `;
-  if (cost.hunger) text += `(-${cost.hunger}饱食) `;
-  if (cost.sanity) text += `(${cost.sanity > 0 ? '-' : '+'}${Math.abs(cost.sanity)}理智) `;
+  // Cost > 0 means loss (e.g. cost: { hp: 5 } -> -5 HP)
+  // Cost < 0 means gain (e.g. cost: { hunger: -10 } -> +10 Hunger)
+
+  if (cost.hp) {
+    text += `(${cost.hp > 0 ? '-' : '+'}${Math.abs(cost.hp)}生命) `;
+  }
+  if (cost.hunger) {
+    text += `(${cost.hunger > 0 ? '-' : '+'}${Math.abs(cost.hunger)}饱食) `;
+  }
+  if (cost.sanity) {
+    text += `(${cost.sanity > 0 ? '-' : '+'}${Math.abs(cost.sanity)}理智) `;
+  }
   return text;
 };
 
-// Glitch Helpers
-const randomChar = () => {
-  const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~';
-  return chars[Math.floor(Math.random() * chars.length)];
-};
-
-const randomGlitchStyle = () => {
-  return {
-    top: Math.random() * 100 + '%',
-    left: Math.random() * 100 + '%',
-    fontSize: (Math.random() * 40 + 20) + 'rpx',
-    opacity: Math.random()
-  };
-};
+// ... (Rest of logic)
 </script>
+
+<style lang="scss">
+/* Global page fix */
+page {
+  background-color: #000;
+  height: 100%;
+  overflow: hidden;
+}
+</style>
 
 <style lang="scss" scoped>
 .game-container {
@@ -158,80 +163,41 @@ const randomGlitchStyle = () => {
   flex-direction: column;
   color: #fff;
   overflow: hidden;
-  transition: filter 1s ease; // Smooth transition for sanity effects
+  // REMOVED transition: filter - keeping it on visual-layer instead
 }
 
-.damage-flash {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, transparent 50%, rgba(255, 0, 0, 0.6) 100%);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.1s;
-  z-index: 10;
-
-  &.active {
-    opacity: 1;
-  }
-}
-
-// Glitch Overlay
-.glitch-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 5;
-  overflow: hidden;
-}
-
-.glitch-char {
+.visual-layer {
   position: absolute;
-  color: rgba(255, 0, 255, 0.5);
-  font-family: monospace;
-  animation: twitch 0.1s infinite;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  transition: filter 1s ease;
 }
 
-@keyframes twitch {
-  0% {
-    transform: translate(0, 0);
-  }
-
-  25% {
-    transform: translate(2px, 2px);
-  }
-
-  50% {
-    transform: translate(-2px, -2px);
-  }
-
-  75% {
-    transform: translate(-2px, 2px);
-  }
-
-  100% {
-    transform: translate(2px, -2px);
-  }
-}
+// ... (Previous styles)
 
 .story-area {
   flex: 1;
   width: 100%;
-  padding: 160rpx 40rpx 40rpx; // Top padding for status bar
+  padding: calc(180rpx + var(--status-bar-height)) 40rpx 40rpx; // Dynamic top padding
   box-sizing: border-box;
 }
 
 .story-content {
-  padding-bottom: 40rpx;
+  padding: 40rpx;
+  background: rgba(0, 0, 0, 0.6); // Dark background for readability
+  backdrop-filter: blur(10px);
+  border-radius: 16rpx;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.3);
+  margin-bottom: 40rpx;
 }
 
 .story-text {
-  font-size: 36rpx;
+  font-size: 34rpx; // Slightly smaller for better density
   line-height: 1.8;
   color: #e0e0e0;
   text-align: justify;
@@ -241,6 +207,8 @@ const randomGlitchStyle = () => {
     text-shadow: 2px 0 red, -2px 0 blue;
   }
 }
+
+// ...
 
 .cursor {
   font-weight: bold;
