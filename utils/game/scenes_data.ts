@@ -486,7 +486,7 @@ const mapScenes: Record<string, Scene> = {
   node_wanxian: {
     id: "node_wanxian",
     text: "早上7:18出发。经过雷公庙，开始爬升万仙阵。沿途出现了许多玛尼堆。石海路经过修整，虽然要爬升1小时，但心情格外轻松。",
-    bg: "loc_stone_sea",
+    bg: "loc_wanxian",
     choices: [
       {
         text: "向着最高峰前进",
@@ -565,7 +565,7 @@ const mapScenes: Record<string, Scene> = {
   node_baxiantai: {
     id: "node_baxiantai",
     text: "【拔仙台】海拔3767.2米！看着满地的残垣断壁，俯视着秦川大地。你告诉自己：梦想总会实现，一切皆有可能。",
-    bg: "bg_sunny",
+    bg: "loc_baxiantai_ruins",
     choices: [{ text: "带着自豪下撤至大爷海", target: "node_daye_lake" }],
   },
 
@@ -582,7 +582,7 @@ const mapScenes: Record<string, Scene> = {
   node_wengong: {
     id: "node_wengong",
     text: "通往文公庙的路已经是景区步道。到达大文公庙，队伍在此分道：直行去坐索道下山（小鳌太），左行去鹦鸽镇（大鳌太）。",
-    bg: "loc_temple",
+    bg: "loc_wengong_temple",
     choices: [
       {
         text: "直行：坐索道下山 (结束旅程)",
@@ -599,7 +599,7 @@ const mapScenes: Record<string, Scene> = {
   node_fangyang: {
     id: "node_fangyang",
     text: "下山一路穿行在红杉林中。到达放羊寺，果然没找到水。还要走1.5小时才能到今天的营地。",
-    bg: "loc_forest",
+    bg: "loc_fangyang_temple",
     choices: [
       {
         text: "咬牙坚持",
@@ -612,7 +612,7 @@ const mapScenes: Record<string, Scene> = {
   node_mingxing: {
     id: "node_mingxing",
     text: "下午18:00，抵达明星寺。水源在崖壁下方。今天是第五天，最艰难的时刻已经过去，明天就是出山的日子。",
-    bg: "loc_temple",
+    bg: "loc_mingxing_temple",
     choices: [
       {
         text: "扎营，期待明天",
@@ -640,7 +640,7 @@ const mapScenes: Record<string, Scene> = {
   node_pingan: {
     id: "node_pingan",
     text: "抵达平安寺。从这里开始，一路是4小时的疯狂下坡。路太陡了，想找块平坦的地方坐下休息都难。",
-    bg: "loc_temple",
+    bg: "loc_pingan_temple",
     choices: [
       {
         text: "一口气冲下山",
@@ -653,7 +653,7 @@ const mapScenes: Record<string, Scene> = {
   node_yangpi_gully: {
     id: "node_yangpi_gully",
     text: "看到警示牌后，沿着“羊皮沟”的溪谷伴行。溪水潺潺，文明世界的气息越来越浓。",
-    bg: "loc_river",
+    bg: "loc_yangpi_gully",
     choices: [
       {
         text: "走出大山",
@@ -833,10 +833,10 @@ const eventScenes: Record<string, Scene> = {
   evt_hallucination_music: {
     id: "evt_hallucination_music",
     text: "恍惚中，你听到风中传来了秦腔的吼声，高亢激昂。但这里是海拔3000米的无人区，哪来的戏班子？",
-    bg: "bg_fog",
+    bg: "evt_phantom_opera",
     choices: [
       {
-        text: "停下来仔细听 (可能是幻觉)",
+        text: "停下来仔细听",
         cost: { sanity: -10, hunger: 5 },
         target: "resume",
       },
@@ -850,7 +850,7 @@ const eventScenes: Record<string, Scene> = {
   evt_gear_failure: {
     id: "evt_gear_failure",
     text: "突然脚下一软，你发现登山鞋的甚至脱胶了，“张开了大嘴”。这是鳌太路上最令人崩溃的装备故障之一。",
-    bg: "loc_stone_sea",
+    bg: "evt_broken_shoe",
     choices: [
       {
         text: "用求生绳绑住",
@@ -867,7 +867,7 @@ const eventScenes: Record<string, Scene> = {
   evt_trail_angel: {
     id: "evt_trail_angel",
     text: "在路边的大石头下，你发现了一瓶矿泉水，上面写着“水神赐予后来人”。在这缺水的山脊上，这是无价之宝。",
-    bg: "loc_stone_sea",
+    bg: "evt_water_bottle",
     choices: [
       {
         text: "感激地喝掉",
@@ -884,7 +884,7 @@ const eventScenes: Record<string, Scene> = {
   evt_lightning: {
     id: "evt_lightning",
     text: "头皮突然发麻，头发竖了起来，空气中充满了滋滋的电流声！是这雷击的前兆！",
-    bg: "bg_storm",
+    bg: "evt_lightning_hair",
     choices: [
       {
         text: "扔掉登山杖，抱头蹲下",
@@ -900,7 +900,7 @@ const eventScenes: Record<string, Scene> = {
   evt_wild_boar: {
     id: "evt_wild_boar",
     text: "前方的箭竹林里传来巨大的“哗啦”声，似乎有庞然大物在穿行。可能是野猪，也可能是黑熊。",
-    bg: "loc_forest",
+    bg: "evt_wild_boar_shadow",
     choices: [
       {
         text: "敲击登山杖制造噪音",
