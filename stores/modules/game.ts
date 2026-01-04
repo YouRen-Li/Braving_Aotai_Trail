@@ -550,9 +550,14 @@ export const useGameStore = defineStore("game", {
         this.currentSceneId = sceneId;
         this.saveGame();
 
+        // [FIX] Success/Retreat endings now trigger Settlement Screen
         if (sceneId.startsWith("end_")) {
           const metaStore = useMetaStore();
           metaStore.unlockEnding(sceneId);
+
+          this.gameState = "ended";
+          this.history.push(`结局: ${sceneId}`); // Push key for panel to read
+          console.log(`Ending reached: ${sceneId}`);
         }
       } else {
         console.error(`Scene not found: ${sceneId}`);

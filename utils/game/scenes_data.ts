@@ -689,25 +689,32 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "走出大山",
-        target: "end_grand_success",
+        target: "node_exit_village",
       },
     ],
   },
 
-  end_grand_success: {
-    id: "end_grand_success",
+  node_exit_village: {
+    id: "node_exit_village",
     text: "【出山】下午13:10，你抵达了南源村农家乐。你也终于完成了此次大鳌太穿越！接下来怎么回西安？",
     bg: "loc_village",
     choices: [
       {
         text: "包车去岐山坐动车 (快，推荐)",
-        action: "restart",
+        target: "end_game_cleared",
       },
       {
         text: "包车去眉县坐大巴 (慢)",
-        action: "restart",
+        target: "end_game_cleared",
       },
     ],
+  },
+
+  end_game_cleared: {
+    id: "end_game_cleared",
+    text: "无论选择哪种方式回家，当你坐在舒适的座椅上，回望那连绵的秦岭雪线时，你知道这段记忆将终生难忘。",
+    bg: "bg_sunny",
+    choices: [{ text: "旅途圆满结束" }],
   },
 
   // --- Endings ---

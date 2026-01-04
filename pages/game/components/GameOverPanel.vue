@@ -41,7 +41,7 @@ watch(() => gameStore.gameState, (newVal) => {
         // Give user 2 seconds to read the death text before showing modal
         setTimeout(() => {
             visible.value = true;
-        }, 2000);
+        }, 4000);
     } else {
         visible.value = false;
     }
