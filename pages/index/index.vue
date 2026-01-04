@@ -67,11 +67,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useGameStore } from '@/stores/modules/game'
+import { ref, onMounted } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
+import { useGameStore } from '@/stores/modules/game';
 
-const snowflakes = ref([])
-const gameStore = useGameStore()
+const gameStore = useGameStore();
+const hasSave = ref(false);
+const snowflakes = ref([]);
 
 onMounted(() => {
   // 生成少量的雪花，营造淡淡的氛围
@@ -86,37 +88,44 @@ onMounted(() => {
       opacity: 0.2 + Math.random() * 0.4 // 0.2-0.6 淡淡的
     })
   }
-})
+});
 
-// 开始徒步
+onShow(() => {
+  // Check if save exists in storage
+  const saved = uni.getStorageSync('braving_aotai_save_v1');
+  hasSave.value = !!(saved && saved.currentSceneId);
+});
+
 const handleStartHike = () => {
-  gameStore.initGame()
-  uni.navigateTo({
-    url: '/pages/game/index'
-  })
-}
-
-// 继续徒步
-const handleContinueHike = () => {
-  if (gameStore.gameState !== 'idle') {
-      uni.navigateTo({
-        url: '/pages/game/index'
-      })
+  if (hasSave.value) {
+    uni.showModal({
+      title: '提示',
+      content: '开始新游戏将覆盖现有存档，确定吗？',
+      success: (res) => {
+        if (res.confirm) {
+          gameStore.initGame();
+          uni.navigateTo({ url: '/pages/game/index' });
+        }
+      }
+    });
   } else {
-      uni.showToast({
-        title: '暂无存档',
-        icon: 'none'
-      })
+    gameStore.initGame();
+    uni.navigateTo({ url: '/pages/game/index' });
   }
-}
+};
 
-// 关于游戏
+const handleContinueHike = () => {
+  if (gameStore.loadGame()) {
+    uni.navigateTo({ url: '/pages/game/index' });
+  } else {
+    uni.showToast({ title: '存档丢失或损坏', icon: 'none' });
+    hasSave.value = false;
+  }
+};
+
 const handleAbout = () => {
-  uni.showToast({
-    title: '关于勇闯鳌太',
-    icon: 'none'
-  })
-}
+  uni.showToast({ title: '致敬所有勇敢的攀登者', icon: 'none' });
+};
 </script>
 
 <style lang="scss" scoped>

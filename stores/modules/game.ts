@@ -232,6 +232,7 @@ export const useGameStore = defineStore("game", {
     moveToScene(sceneId: string) {
       if (scenes[sceneId]) {
         this.currentSceneId = sceneId;
+        this.saveGame(); // Auto save on scene change
       } else {
         console.error(`Scene not found: ${sceneId}`);
       }
@@ -249,8 +250,58 @@ export const useGameStore = defineStore("game", {
     // 死亡处理
     die(reason: string) {
       this.gameState = "ended";
-      this.moveToScene("dead_001");
+      // Do not use move to scene here to prevent auto-save overwriting "alive" state?
+      // Actually we want to save the death state so user can't just refresh to revive.
+      this.currentSceneId = "dead_001";
+      this.history.push(`死因: ${reason}`);
+      this.saveGame();
       console.log(`Player died: ${reason}`);
+    },
+
+    // --- 持久化 ---
+
+    saveGame() {
+      try {
+        const dataToSave = {
+          gameState: this.gameState,
+          currentSceneId: this.currentSceneId,
+          player: this.player,
+          status: this.status,
+          inventory: this.inventory,
+          weather: this.weather,
+          history: this.history,
+        };
+        uni.setStorageSync("braving_aotai_save_v1", dataToSave);
+        // console.log('Game Saved');
+      } catch (e) {
+        console.error("Save failed", e);
+      }
+    },
+
+    loadGame(): boolean {
+      try {
+        const saved = uni.getStorageSync("braving_aotai_save_v1");
+        if (saved && saved.currentSceneId) {
+          this.gameState = saved.gameState;
+          this.currentSceneId = saved.currentSceneId;
+          this.player = saved.player;
+          this.status = saved.status;
+          this.inventory = saved.inventory || [];
+          this.weather = saved.weather || "sunny";
+          this.history = saved.history || [];
+          console.log("Game Loaded");
+          return true;
+        }
+      } catch (e) {
+        console.error("Load failed", e);
+      }
+      return false;
+    },
+
+    clearSave() {
+      try {
+        uni.removeStorageSync("braving_aotai_save_v1");
+      } catch (e) {}
     },
   },
 });

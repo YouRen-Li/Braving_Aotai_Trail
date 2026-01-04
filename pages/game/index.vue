@@ -9,6 +9,9 @@
     <!-- 背包弹窗 -->
     <inventory-panel v-model:visible="showInventory" />
 
+    <!-- 结算弹窗 -->
+    <game-over-panel />
+
     <!-- 剧情显示区 -->
     <scroll-view scroll-y class="story-area" @click="handleTextClick">
       <view class="story-content">
@@ -36,6 +39,7 @@ import { useGameStore } from '@/stores/modules/game';
 import GameStatus from './components/GameStatus.vue';
 import BagButton from './components/BagButton.vue';
 import InventoryPanel from './components/InventoryPanel.vue';
+import GameOverPanel from './components/GameOverPanel.vue';
 import { useTypewriter } from '@/utils/composables/useTypewriter';
 
 const gameStore = useGameStore();
