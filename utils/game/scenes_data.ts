@@ -67,12 +67,12 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "踩着石头跳过去",
         target: "node_forest_entry",
-        cost: { hunger: 3, sanity: 2 }, // Reduced hunger
+        cost: { hunger: -5, sanity: 2 }, // Drink water
       },
       {
         text: "脱鞋涉水",
         target: "node_forest_entry",
-        cost: { hp: 2, hunger: 2 }, // Reduced
+        cost: { hp: 2, hunger: -5 }, // Drink water
       },
     ],
   },
@@ -104,7 +104,7 @@ const mapScenes: Record<string, Scene> = {
       { text: "咬牙坚持", target: "node_2900", cost: { hunger: 15, hp: 5 } },
       {
         text: "喝口水继续赶路",
-        cost: { hp: -5, hunger: 5 },
+        cost: { hp: -5, hunger: -5 },
         target: "node_2900",
       },
     ],
@@ -248,7 +248,7 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "强行翻越石海",
         target: "node_knife_ridge",
-        cost: { hunger: 20, hp: 15, sanity: -5 },
+        cost: { hunger: 20, hp: 15, sanity: 5 },
       },
     ],
   },
@@ -261,7 +261,7 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "长舒一口气，滑下碎石坡",
         target: "node_shuiwozi_source",
-        cost: { hunger: 5, sanity: 5 }, // Sanity restore
+        cost: { hunger: 5, sanity: -5 }, // Sanity restore
       },
     ],
   },
@@ -279,7 +279,7 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "垭口无水扎营",
         target: "node_plane_wreck", // Implies a harder start next day or skipping water
-        cost: { hunger: 10, sanity: -5 },
+        cost: { hunger: 10, sanity: 5 },
       },
     ],
   },
@@ -569,7 +569,7 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "冷静下来，观察兽道",
         target: "node_pyramid_ascent",
-        cost: { hunger: 15, sanity: 5 }, // Stress
+        cost: { hunger: 15, sanity: -5 }, // Calm/Relief
       },
     ],
   },
@@ -789,7 +789,7 @@ const eventScenes: Record<string, Scene> = {
       { text: "自身难保，离开", cost: { sanity: 10 }, target: "resume" }, // Guilt
       {
         text: "尝试帮他求救",
-        cost: { hp: 20, hunger: 20, sanity: -5 },
+        cost: { hp: 20, hunger: 20, sanity: -15 },
         target: "resume",
       },
     ],
@@ -853,7 +853,7 @@ const eventScenes: Record<string, Scene> = {
     bg: "evt_frozen_body",
     choices: [
       { text: "搜寻遗物", action: "loot_supplies", target: "resume" },
-      { text: "默哀并离开", cost: { hunger: 5, sanity: 10 }, target: "resume" },
+      { text: "默哀并离开", cost: { hunger: 5, sanity: -5 }, target: "resume" },
     ],
   },
   evt_takin: {
@@ -910,12 +910,12 @@ const eventScenes: Record<string, Scene> = {
     choices: [
       {
         text: "感激地喝掉",
-        cost: { hunger: -10, sanity: 5 },
+        cost: { hunger: -10, sanity: -5 },
         target: "resume",
       },
       {
         text: "留给更需要的人",
-        cost: { sanity: 15 }, // Karma boost
+        cost: { sanity: -15 }, // Karma boost
         target: "resume",
       },
     ],
