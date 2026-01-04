@@ -114,6 +114,10 @@ const close = () => {
 };
 
 const selectInventory = (index) => {
+    if (selectedType.value === 'inv' && selectedIndex.value === index) {
+        selectedIndex.value = -1;
+        return;
+    }
     selectedType.value = 'inv';
     selectedIndex.value = index;
 };
@@ -242,6 +246,9 @@ const handleAction = () => {
     background: #252525;
     padding: 20rpx;
     box-sizing: border-box;
+    /* Ensure flex child shrinks and scrolls */
+    min-height: 0;
+    overflow-y: scroll;
 }
 
 .grid {

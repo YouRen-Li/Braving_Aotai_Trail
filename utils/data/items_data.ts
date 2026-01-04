@@ -87,7 +87,7 @@ export const items: Record<string, Item> = {
   gear_headlamp_01: {
     id: "gear_headlamp_01",
     name: "手电筒",
-    description: "夜间行进的生命之光。没有它，夜晚就是地狱。",
+    description: "夜间行进必备。装备后可在夜晚获得视野，避免理智大幅下降。",
     type: "gear",
     slot: "head",
     icon: "🔦",

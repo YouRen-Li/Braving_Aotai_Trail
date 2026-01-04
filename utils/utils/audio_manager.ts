@@ -75,13 +75,13 @@ class AudioManager {
     let src = "";
     switch (type) {
       case "heartbeat":
-        src = "/static/audio/sfx_heartbeat.mp3";
+        // src = "/static/audio/sfx_heartbeat.mp3"; // Missing
         break;
       case "scream":
-        src = "/static/audio/sfx_scream.mp3";
+        // src = "/static/audio/sfx_scream.mp3"; // Missing
         break;
       case "step":
-        src = "/static/audio/sfx_step.mp3";
+        // src = "/static/audio/sfx_step.mp3"; // Missing
         break;
     }
 
