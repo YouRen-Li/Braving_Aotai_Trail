@@ -40,7 +40,7 @@
     <view class="action-area" :class="{ disabled: isTyping }">
       <view v-for="(choice, index) in currentScene.choices" :key="index" class="choice-btn" hover-class="btn-hover"
         @click="onChoose(choice)">
-        <text class="btn-text">{{ choice.text }}</text>
+        <text class="btn-text" :class="{ 'glitch-text': showGlitch }">{{ corruptedChoiceText(choice.text) }}</text>
         <!-- Removed Cost Hint for Realism -->
       </view>
       <!-- Night Warning -->
@@ -61,6 +61,7 @@ import GameOverPanel from './components/GameOverPanel.vue';
 import BackgroundLayer from './components/BackgroundLayer.vue';
 import DayNightOverlay from './components/DayNightOverlay.vue'; // [NEW]
 import { useTypewriter } from '@/utils/composables/useTypewriter';
+import { getCorruptedText } from '@/utils/game/sanity_utils'; // [NEW]
 
 const gameStore = useGameStore();
 const currentScene = computed(() => gameStore.currentScene);
@@ -89,10 +90,40 @@ const sanityStyle = computed(() => {
     hue = (30 - s) * 2; // 0 to 60deg
   }
 
-  return {
+  const style = {
     filter: `grayscale(${grayscale}) blur(${blur}px) hue-rotate(${hue}deg)`
   };
+
+  // Screen Shake at critical sanity
+  if (s < 20) {
+    const shake = Math.random() * 10 - 5; // -5 to 5px
+    style.transform = `translateX(${shake}px)`;
+  }
+
+  return style;
 });
+
+// [NEW] Glitch Methods
+const randomChar = () => {
+  const chars = '!@#$%^&*()_+-={}[]|;:,.<>?/☠️❌';
+  return chars[Math.floor(Math.random() * chars.length)];
+};
+
+const randomGlitchStyle = () => {
+  const top = Math.random() * 100;
+  const left = Math.random() * 100;
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    fontSize: `${Math.random() * 40 + 20}rpx`,
+    opacity: Math.random(),
+    transform: `rotate(${Math.random() * 360}deg)`
+  };
+};
+
+const corruptedChoiceText = (text) => {
+  return getCorruptedText(text, gameStore.status.sanity);
+};
 
 // 打字机特效
 const { displayedText, isTyping, start, skip } = useTypewriter();
@@ -203,6 +234,31 @@ page {
 
   &.text-distort {
     text-shadow: 2px 0 red, -2px 0 blue;
+    animation: text-shake 0.1s infinite;
+    color: #ff4d4d; // Subtle red tint
+  }
+}
+
+// [NEW] Text Animations
+@keyframes text-shake {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  25% {
+    transform: translate(2rpx, 2rpx);
+  }
+
+  50% {
+    transform: translate(-2rpx, -2rpx);
+  }
+
+  75% {
+    transform: translate(-2rpx, 2rpx);
+  }
+
+  100% {
+    transform: translate(2rpx, -2rpx);
   }
 }
 
@@ -262,6 +318,12 @@ page {
 .btn-text {
   font-size: 32rpx;
   font-weight: 500;
+
+  &.glitch-text {
+    font-family: "Courier New", Courier, monospace; // Glitchy font
+    color: #ff4d4d;
+    animation: text-shake 0.2s infinite;
+  }
 }
 
 .cost-hint {

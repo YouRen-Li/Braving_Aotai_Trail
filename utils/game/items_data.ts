@@ -93,4 +93,18 @@ export const items: Record<string, Item> = {
     icon: "🔦",
     stats: { warmth: 0 },
   },
+  // --- CURSED ITEMS ---
+  relic_watch: {
+    id: "relic_watch",
+    name: "停摆的怀表",
+    description:
+      "表针永远停在 04:44。背面刻着模糊不清的名字。随着带着它，你总感觉背后有东西...",
+    type: "tool",
+    icon: "⌚",
+    stackable: false,
+    effect: {
+      sanity: -5, // Passive drain if used? Or just lore. The logic is in game.ts
+      msg: "滴答...滴答...它明明没有走动。",
+    },
+  },
 };

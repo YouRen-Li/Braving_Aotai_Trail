@@ -6,6 +6,7 @@ export interface Role {
   title: string;
   description: string;
   avatar: string; // Emoji for now
+  traits: string[]; // [NEW] Role-specific traits
   stats: {
     maxHp: number;
     maxSanity: number;
@@ -21,6 +22,7 @@ export const roles: Role[] = [
     title: "The Student",
     description: "年轻气盛，精神充沛。兼职送外卖买的强光手电是唯一的依靠。",
     avatar: "🎓",
+    traits: ["tech_savvy"], // Can use electronics better? (Placeholder)
     stats: {
       maxHp: 90,
       maxHunger: 100,
@@ -34,9 +36,10 @@ export const roles: Role[] = [
     title: "The Athlete",
     description: "体能怪兽，耐力惊人。但他那像燃烧炉一样的身体需要大量食物。",
     avatar: "🏃",
+    traits: ["high_metabolism"], // Hunger drains faster, but maybe has higher physical cap
     stats: {
       maxHp: 130,
-      maxHunger: 100, // Hunger drains naturally faster via game logic mod? Or just starts same
+      maxHunger: 100,
       maxSanity: 100,
     },
     items: ["food_001", "water_001", "water_001"],
@@ -47,6 +50,7 @@ export const roles: Role[] = [
     title: "The Doctor",
     description: "冷静专业，救死扶伤。随身携带的急救药品能应对突发状况。",
     avatar: "🩺",
+    traits: ["field_medic"], // Heal efficiency +50%
     stats: {
       maxHp: 100,
       maxHunger: 100,
@@ -58,8 +62,10 @@ export const roles: Role[] = [
     id: "veteran",
     name: "退伍军人",
     title: "The Veteran",
-    description: "野外生存专家。那双穿旧的登山靴曾随他征服过无数高山。",
+    description:
+      "野外生存专家。创伤后的他，在极端的风暴中反而能获得奇异的平静。",
     avatar: "🪖",
+    traits: ["iron_will", "ptsd_storm_calm"], // Immune to dark fear, Sanity RECOVERS in storms
     stats: {
       maxHp: 110,
       maxHunger: 100,

@@ -113,6 +113,12 @@ export const useGameStore = defineStore("game", {
       });
       return { warmth, speed };
     },
+
+    // [NEW] Role Traits
+    playerTraits: (state): string[] => {
+      const role = roles.find((r) => r.id === state.player.roleId);
+      return role ? role.traits : [];
+    },
   },
 
   actions: {
@@ -202,8 +208,22 @@ export const useGameStore = defineStore("game", {
         }
 
         // 提示信息
-        if (item.effect.msg) {
-          uni.showToast({ title: item.effect.msg, icon: "none" });
+        let msg = item.effect.msg;
+
+        // [TRAIT] Field Medic
+        if (this.playerTraits.includes("field_medic")) {
+          if (item.effect.hp && item.effect.hp > 0) {
+            const bonus = Math.floor(item.effect.hp * 0.5);
+            this.status.hp = Math.min(
+              this.status.maxHp,
+              this.status.hp + bonus
+            );
+            msg += ` (医术加成+${bonus})`;
+          }
+        }
+
+        if (msg) {
+          uni.showToast({ title: msg, icon: "none" });
         }
 
         // 移除消耗品
@@ -331,6 +351,12 @@ export const useGameStore = defineStore("game", {
 
       // 1. Hunger
       let hungerCost = (cost.hunger || 0) * coeff;
+
+      // [TRAIT] High Metabolism (Athlete)
+      if (this.playerTraits.includes("high_metabolism")) {
+        hungerCost *= 1.25; // +25% Hunger drain
+      }
+
       if (stats.speed && stats.speed > 0) {
         const reduction = Math.min(0.5, stats.speed / 100);
         hungerCost = hungerCost * (1 - reduction);
@@ -353,10 +379,20 @@ export const useGameStore = defineStore("game", {
 
       // Night Fall Risk
       if (this.status.isNight && !this.hasVision) {
+        // [TRAIT] Iron Will (Veteran) ignores fear of dark, but still risks falling physically?
+        // User said: "Not afraid of black". Usually refers to Sanity.
+        // Falling is physical. Let's keep physical risk but maybe lower it?
+
         if ((cost.hp || 0) > 0 || (cost.hunger || 0) > 0) {
           if (Math.random() < 0.4) {
-            hpCost += 30;
-            uni.showToast({ title: "摸黑赶路摔伤了！(-30HP)", icon: "none" });
+            // Veteran falls less?
+            let fallChance = 0.4;
+            if (this.playerTraits.includes("iron_will")) fallChance = 0.2;
+
+            if (Math.random() < fallChance) {
+              hpCost += 30;
+              uni.showToast({ title: "摸黑赶路摔伤了！(-30HP)", icon: "none" });
+            }
           }
         }
       }
@@ -365,11 +401,27 @@ export const useGameStore = defineStore("game", {
 
       // 3. Sanity
       let sanityCost = cost.sanity || 0;
+
+      // Weather Sanity Cost
       if (["fog", "storm", "snow"].includes(this.weather)) {
-        sanityCost += 2;
+        // [TRAIT] PTSD Storm Calm (Veteran)
+        if (
+          this.playerTraits.includes("ptsd_storm_calm") &&
+          this.weather === "storm"
+        ) {
+          // Storms calm him down (Positive Sanity)
+          sanityCost -= 5; // Heals 5 sanity in storm
+        } else {
+          sanityCost += 2;
+        }
       }
+
+      // Night Sanity Cost
       if (this.status.isNight && !this.hasVision) {
-        sanityCost += 5;
+        // [TRAIT] Iron Will (Veteran) ignores darkness fear
+        if (!this.playerTraits.includes("iron_will")) {
+          sanityCost += 5;
+        }
       }
 
       this.status.sanity = Math.max(0, this.status.sanity - sanityCost);
@@ -396,23 +448,39 @@ export const useGameStore = defineStore("game", {
 
           this.status.hunger = Math.max(0, this.status.hunger - 25);
 
-          let heal = 30;
-          if (this.weather === "storm") heal = 10;
-          if (this.weather === "sunny") heal = 50;
+          // [MORAL DILEMMA] Cursed Items check
+          // If player has 'relic_watch' (Dead man's watch), resting is less effective/painful
+          const hasCursedItem = this.inventory.some(
+            (i) => i.id === "relic_watch"
+          );
+
+          if (hasCursedItem) {
+            uni.showToast({
+              title: "死者的手表在背包里滴答作响...你彻夜难眠",
+              icon: "none",
+            });
+            heal = Math.floor(heal * 0.5); // Heal reduced
+            this.status.sanity = Math.max(0, this.status.sanity - 10); // Sanity drops instead of efficient gain
+            // Still advances day
+          } else {
+            // Normal Sanity Heal
+            this.status.sanity = Math.min(
+              this.status.maxSanity,
+              this.status.sanity + 20
+            );
+          }
 
           this.status.hp = Math.min(this.status.maxHp, this.status.hp + heal);
-          this.status.sanity = Math.min(
-            this.status.maxSanity,
-            this.status.sanity + 20
-          );
           this.status.isNight = false;
           this.player.days += 1;
           this.randomizeWeather();
 
-          uni.showToast({
-            title: `休息一晚 (生命+${heal}, 饱食-25)`,
-            icon: "none",
-          });
+          if (!hasCursedItem) {
+            uni.showToast({
+              title: `休息一晚 (生命+${heal}, 饱食-25)`,
+              icon: "none",
+            });
+          }
           this.saveGame();
           break;
         case "loot_supplies":
