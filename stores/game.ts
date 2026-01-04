@@ -363,7 +363,16 @@ export const useGameStore = defineStore("game", {
         }
 
         // Random Event logic
-        if (choice.target.startsWith("node_") && Math.random() < 0.3) {
+        // [FIX] Check for safe flag on target scene
+        const targetScene = scenes[choice.target];
+        // If target scene is explicitly safe, skip random events
+        const isSafe = targetScene && targetScene.safe === true;
+
+        if (
+          choice.target.startsWith("node_") &&
+          Math.random() < 0.1 && // 降低随机事件概率：30% -> 10%
+          !isSafe
+        ) {
           this.nextSceneId = choice.target;
           const eventId =
             randomEventIds[Math.floor(Math.random() * randomEventIds.length)];

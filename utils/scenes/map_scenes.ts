@@ -6,6 +6,7 @@ export const mapScenes: Record<string, Scene> = {
     id: "start_001",
     text: "这里是塘口村，鳌太线的起点。清晨的空气冷冽刺骨。眼前是连绵的秦岭山脉，墨绿色的冷杉林在风中低语。这一去，便是数日的无人区。",
     bg: "loc_village",
+    safe: true,
     choices: [
       {
         text: "坐秀才家的拖拉机上山",
@@ -24,6 +25,7 @@ export const mapScenes: Record<string, Scene> = {
     id: "node_tractor_ride",
     text: "拖拉机突突突地冒着黑烟，颠簸得像在骑马。虽然屁股受罪，但好歹省下了几公里爬坡的力气。秀才回头喊道：“这几天有雨，此时回头还来得及！”",
     bg: "loc_tractor_road",
+    safe: true,
     choices: [
       {
         text: "谢过秀才，下车",
@@ -36,6 +38,7 @@ export const mapScenes: Record<string, Scene> = {
     id: "node_hike_feedback",
     text: "还没进山，水泥路的上坡就让你气喘吁吁。背包带勒进肩膀，由于还没热身，每一步都显得格外沉重。\n(状态反馈：饱食度 -2)",
     bg: "loc_village",
+    safe: true,
     choices: [
       {
         text: "调整呼吸，继续",
@@ -48,6 +51,7 @@ export const mapScenes: Record<string, Scene> = {
     id: "node_village_road",
     text: "机耕路尽头是登山口。告示牌醒目写着：此为国家级自然保护区，禁止入内。违者罚款100-5000元。为了安全，请立即原路返回。",
     bg: "loc_tractor_road",
+    safe: true,
     choices: [
       {
         text: "加快脚步热身",
@@ -66,6 +70,7 @@ export const mapScenes: Record<string, Scene> = {
     id: "node_village_road_hike_feedback",
     text: "你加快了步频，身体逐渐热了起来。虽然只是机耕路，但坡度已经让你微微出汗。你感觉身体慢慢进入了状态。\n(状态反馈：饱食度 -2)",
     bg: "loc_tractor_road",
+    safe: true,
     choices: [
       {
         text: "身体活动开了",
@@ -78,6 +83,7 @@ export const mapScenes: Record<string, Scene> = {
     id: "node_village_road_check_feedback",
     text: "你停下来仔细检查了背包扣件和鞋带，重新调整了负重系统。虽然耽误了一点时间，但磨刀不误砍柴工，接下来的路会舒服很多。\n(状态反馈：饱食度 -1)",
     bg: "loc_tractor_road",
+    safe: true,
     choices: [
       {
         text: "确认无误",

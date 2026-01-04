@@ -20,4 +20,5 @@ export interface Scene {
   bg?: string;
   type?: "normal" | "loot" | "event";
   weatherText?: Record<string, string>; // Key: WeatherType (sunny, storm, etc.)
+  safe?: boolean; // If true, no random events will occur when transitioning to this scene
 }

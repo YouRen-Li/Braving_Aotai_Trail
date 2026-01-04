@@ -30,8 +30,8 @@ export const items: Record<string, Item> = {
     type: "consumable",
     icon: "💧",
     effect: {
-      hunger: 5,
-      msg: "你喝了一口水，感觉喉咙舒服多了。(饱食+5)",
+      hunger: 15,
+      msg: "你喝了一口水，感觉喉咙舒服多了。(饱食+15)",
     },
   },
   food_001: {
