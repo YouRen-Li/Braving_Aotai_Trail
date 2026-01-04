@@ -29,14 +29,24 @@ const currentBg = ref(weatherMap['sunny']);
 const lastBg = ref('');
 const isTransitioning = ref(false);
 
-watch(() => gameStore.weather, (newVal) => {
-    const newSrc = weatherMap[newVal] || weatherMap['sunny'];
+const currentScene = computed(() => gameStore.currentScene);
+const weather = computed(() => gameStore.weather);
+
+// Priority: Scene BG > Weather BG
+const targetBg = computed(() => {
+    if (currentScene.value && currentScene.value.bg) {
+        return `/static/images/${currentScene.value.bg}.png`;
+    }
+    const w = weather.value || 'sunny';
+    return weatherMap[w] || weatherMap['sunny'];
+});
+
+watch(targetBg, (newSrc) => {
     if (newSrc !== currentBg.value) {
         lastBg.value = currentBg.value;
         currentBg.value = newSrc;
         isTransitioning.value = true;
 
-        // Cleanup lastBg after transition
         setTimeout(() => {
             lastBg.value = '';
             isTransitioning.value = false;

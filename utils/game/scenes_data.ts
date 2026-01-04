@@ -39,7 +39,7 @@ const mapScenes: Record<string, Scene> = {
   node_village_road: {
     id: "node_village_road",
     text: "【机耕路】还是平缓的土路。你沿着河谷前行，还能看到远处农家的炊烟。这是最后的文明痕迹。背包的重量开始压在肩上。",
-    bg: "loc_village", // Updated
+    bg: "loc_tractor_road",
     choices: [
       {
         text: "加快脚步热身",
