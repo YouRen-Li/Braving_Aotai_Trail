@@ -1,0 +1,25 @@
+{
+  "hash": "11ce0875",
+  "configHash": "c227833e",
+  "lockfileHash": "13dd4654",
+  "browserHash": "2bcd0ccc",
+  "optimized": {
+    "wot-design-uni": {
+      "src": "../../../../../node_modules/wot-design-uni/index.ts",
+      "file": "wot-design-uni.js",
+      "fileHash": "691e5137",
+      "needsInterop": false
+    },
+    "luch-request": {
+      "src": "../../../../../node_modules/luch-request/src/lib/luch-request.js",
+      "file": "luch-request.js",
+      "fileHash": "4e5fdcb2",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-7U33LM2Z": {
+      "file": "chunk-7U33LM2Z.js"
+    }
+  }
+}
