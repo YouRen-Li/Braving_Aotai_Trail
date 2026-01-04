@@ -30,6 +30,15 @@
         </view>
         <text class="value">{{ Math.floor(hunger) }}</text>
       </view>
+
+      <!-- 理智值 [NEW] -->
+      <view class="bar-row">
+        <text class="icon">🧠</text>
+        <view class="progress-bg">
+          <view class="progress-fill sanity-fill" :style="{ width: sanity + '%' }"></view>
+        </view>
+        <text class="value">{{ Math.floor(sanity) }}</text>
+      </view>
     </view>
   </view>
 </template>
@@ -42,6 +51,7 @@ const gameStore = useGameStore();
 
 const hp = computed(() => gameStore.status.hp);
 const hunger = computed(() => gameStore.status.hunger);
+const sanity = computed(() => gameStore.status.sanity || 0); // Safety check
 const days = computed(() => gameStore.player.days);
 const weatherInfo = computed(() => gameStore.currentWeatherInfo);
 </script>
@@ -99,7 +109,7 @@ const weatherInfo = computed(() => gameStore.currentWeatherInfo);
   margin-left: 30rpx;
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
+  gap: 8rpx; // Reduced gap to fit 3 bars
 }
 
 .bar-row {
@@ -124,7 +134,7 @@ const weatherInfo = computed(() => gameStore.currentWeatherInfo);
 
 .progress-bg {
   flex: 1;
-  height: 12rpx;
+  height: 10rpx; // Slightly thinner
   background: rgba(255, 255, 255, 0.2);
   border-radius: 6rpx;
   overflow: hidden;
@@ -143,5 +153,10 @@ const weatherInfo = computed(() => gameStore.currentWeatherInfo);
 
 .hunger-fill {
   background: linear-gradient(90deg, #ffbf00, #ff9900);
+}
+
+.sanity-fill {
+  background: linear-gradient(90deg, #b100ff, #7f00ff);
+  box-shadow: 0 0 10rpx rgba(127, 0, 255, 0.5);
 }
 </style>

@@ -1,6 +1,7 @@
 export interface ChoiceCost {
   hp?: number;
   hunger?: number;
+  sanity?: number;
 }
 
 export interface SceneChoice {
@@ -51,7 +52,7 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "顶着风快速通过",
         target: "node_shuiwozi",
-        cost: { hunger: 20, hp: 10 },
+        cost: { hunger: 20, hp: 10, sanity: 5 }, // High stress
       },
       {
         text: "寻找背风处稍作调整",
@@ -78,13 +79,16 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "穿越迷雾林，前往大爷海",
-        target: "node_fog_forest", // Insert Fog Forest here
+        target: "node_fog_forest",
         cost: { hunger: 15, hp: 5 },
       },
-      { text: "仔细搜索周围", target: "evt_tent" }, // 必触发一次帐篷事件
+      {
+        text: "仔细搜索周围",
+        target: "evt_tent",
+        cost: { sanity: 5 }, // Searching abandoned camps is creepy
+      },
     ],
   },
-  // [NEW] Fog Forest Node
   node_fog_forest: {
     id: "node_fog_forest",
     text: "你进入了一片浓密的冷杉林，大雾弥漫，能见度不足5米。脚下的路若隐若现，很容易迷失方向。（这里是2800到大爷海之间的迷魂阵）",
@@ -92,12 +96,12 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "凭直觉向前走",
         target: "node_daye",
-        cost: { hunger: 20 }, // Low cost but high risk logic handled by game? No, simplified here.
+        cost: { hunger: 20, sanity: 15 }, // High stress to be lost
       },
       {
         text: "仔细辨认路标 (消耗精力)",
         target: "node_daye",
-        cost: { hunger: 25, hp: 5 },
+        cost: { hunger: 25, hp: 5, sanity: 5 },
       },
     ],
   },
@@ -128,7 +132,6 @@ const mapScenes: Record<string, Scene> = {
     text: "你的意识逐渐模糊... 在这片无人区，你成为了大山的一部分。",
     choices: [{ text: "重新开始", action: "restart" }],
   },
-  // [NEW] Catch Ending
   end_caught: {
     id: "end_caught",
     text: "【结局：被捕】你被巡山队带回了派出所。写下保证书，缴纳3000元罚款，并被列入黑名单。这一趟“非法穿越”终究以闹剧收场。",
@@ -138,26 +141,28 @@ const mapScenes: Record<string, Scene> = {
 
 // --- 随机事件 (基于真实案例) ---
 const eventScenes: Record<string, Scene> = {
-  // 案例：失联驴友
   evt_hiker: {
     id: "evt_hiker",
     text: "【随机事件】浓雾中，你隐约听到前方有呼救声。走近一看，是一个眼神涣散的落单驴友。他说同伴走丢了，自己也没水了。",
     choices: [
-      { text: "分他半瓶水，指引方向", cost: { hunger: 10 }, target: "resume" }, // 消耗物资，继续
-      { text: "自身难保，默默离开", target: "resume" },
+      {
+        text: "分他半瓶水，指引方向",
+        cost: { hunger: 10, sanity: -5 },
+        target: "resume",
+      }, // Helping others restores sanity
+      { text: "自身难保，默默离开", cost: { sanity: 10 }, target: "resume" }, // Guilt
       {
         text: "帮他报警(消耗大量时间等待)",
-        cost: { hp: 20, hunger: 20 },
+        cost: { hp: 20, hunger: 20, sanity: -10 }, // Good deed
         target: "resume",
       },
     ],
   },
-  // 案例：废弃帐篷/CO中毒
   evt_tent: {
     id: "evt_tent",
     text: "【随机事件】你发现一顶完好的帐篷搭在路边，但没有任何动静。走近时，心里涌起一股不祥的预感。",
     choices: [
-      { text: "拉开帐篷查看", target: "evt_tent_result" },
+      { text: "拉开帐篷查看", target: "evt_tent_result", cost: { sanity: 5 } },
       { text: "多一事不如少一事，离开", target: "resume" },
     ],
   },
@@ -166,18 +171,23 @@ const eventScenes: Record<string, Scene> = {
     text: "帐篷里空无一人，只有一些散落的气罐和睡袋。看来主人已经离开许久了。你捡起了一些可用的物资。",
     choices: [{ text: "获得物资", target: "resume", action: "loot_supplies" }],
   },
-  // 案例：暴风雪抉择
   evt_storm: {
     id: "evt_storm",
     text: "【突发恶劣天气】狂风骤起，暴雪瞬间吞没了视线！这是最危险的时刻（参考2017年及2021年多起事故）。强行赶路极易失温死亡。",
     choices: [
-      { text: "强行突围", cost: { hp: 40, hunger: 20 }, target: "resume" },
-      { text: "紧急扎营躲避", cost: { hunger: 40 }, target: "resume" }, // 耗时耗粮
+      {
+        text: "强行突围",
+        cost: { hp: 40, hunger: 20, sanity: 10 },
+        target: "resume",
+      },
+      {
+        text: "紧急扎营躲避",
+        cost: { hunger: 40, sanity: 5 },
+        target: "resume",
+      },
       { text: "绝望报警(救援结局)", target: "end_rescue" },
     ],
   },
-
-  // [NEW] Ranger Encounter
   evt_ranger: {
     id: "evt_ranger",
     text: "【突发事件】前方路口出现了几个穿迷彩服的身影——是自然保护区的巡山队！鳌太线早已全线封禁，你这是在非法穿越。",
@@ -185,36 +195,39 @@ const eventScenes: Record<string, Scene> = {
       { text: "配合执法，接受处罚", target: "end_caught" },
       {
         text: "趁雾大，冒险绕路躲避",
-        cost: { hp: 30, hunger: 30 },
+        cost: { hp: 30, hunger: 30, sanity: 10 },
         target: "resume",
-      }, // High cost gamble
+      },
     ],
   },
-
-  // [NEW] Frozen Body (Terminal Burrowing)
   evt_body: {
     id: "evt_body",
     text: "【恐怖发现】在一块巨石的缝隙中，你发现了一具蜷缩的遗体。他衣着单薄，似乎生前有“反常脱衣”现象，头部拼命往石缝里钻（终末挖洞行为）。这残酷的一幕让你不寒而栗。",
     choices: [
       {
-        text: "搜寻遗物 (可能获得装备)",
+        text: "搜寻遗物 (获得物资，折损理智)",
         action: "loot_supplies",
         target: "resume",
-      }, // Morally gray
-      { text: "默哀三分钟，继续赶路", cost: { hunger: 5 }, target: "resume" },
+      }, // Cost handled in action
+      {
+        text: "默哀三分钟，继续赶路",
+        cost: { hunger: 5, sanity: 5 },
+        target: "resume",
+      }, // Still scary
     ],
   },
-
-  // [NEW] Takin Encounter
   evt_takin: {
     id: "evt_takin",
     text: "【猛兽挡道】一头体型硕大的秦岭羚牛挡在了必经之路上。它盯着你，鼻孔喷着白气。这种独行公牛脾气暴躁，极具攻击性。",
     choices: [
-      { text: "原地不动，等待它离开", cost: { hunger: 15 }, target: "resume" },
-      { text: "大声驱赶", cost: { hp: 50 }, target: "resume" }, // High risk of injury
+      {
+        text: "原地不动，等待它离开",
+        cost: { hunger: 15, sanity: 5 },
+        target: "resume",
+      },
+      { text: "大声驱赶", cost: { hp: 50, sanity: 10 }, target: "resume" },
     ],
   },
-
   end_rescue: {
     id: "end_rescue",
     text: "你拨通了救援电话。十几个小时后，救援队把你抬下了山。虽然获救，但正如新闻所说：“这是一场不必要的冒险”。",
@@ -227,11 +240,10 @@ export const scenes: Record<string, Scene> = {
   ...eventScenes,
 };
 
-// Updated random event list
 export const randomEventIds = [
   "evt_hiker",
   "evt_storm",
   "evt_ranger",
   "evt_body",
   "evt_takin",
-]; // evt_tent is manual trigger for now
+];

@@ -1,10 +1,17 @@
 <template>
-  <view class="game-container">
+  <view class="game-container" :style="sanityStyle">
     <!-- 动态背景层 -->
     <background-layer />
 
     <!-- 伤害血红特效 -->
     <view class="damage-flash" :class="{ active: showDamageFlash }"></view>
+
+    <!-- 精神错乱 Glitch 特效 -->
+    <view class="glitch-overlay" v-if="showGlitch">
+      <text v-for="n in 20" :key="n" class="glitch-char" :style="randomGlitchStyle()">
+        {{ randomChar() }}
+      </text>
+    </view>
 
     <!-- 状态栏 -->
     <game-status />
@@ -21,7 +28,7 @@
     <!-- 剧情显示区 -->
     <scroll-view scroll-y class="story-area" @click="handleTextClick">
       <view class="story-content">
-        <text class="story-text">{{ displayedText }}</text>
+        <text class="story-text" :class="{ 'text-distort': showGlitch }">{{ displayedText }}</text>
         <text v-if="isTyping" class="cursor">|</text>
       </view>
     </scroll-view>
@@ -31,7 +38,7 @@
       <view v-for="(choice, index) in currentScene.choices" :key="index" class="choice-btn" hover-class="btn-hover"
         @click="onChoose(choice)">
         <text class="btn-text">{{ choice.text }}</text>
-        <text v-if="choice.cost && (choice.cost.hp || choice.cost.hunger)" class="cost-hint">
+        <text v-if="choice.cost" class="cost-hint">
           {{ formatCost(choice.cost) }}
         </text>
       </view>
@@ -53,6 +60,29 @@ const gameStore = useGameStore();
 const currentScene = computed(() => gameStore.currentScene);
 const showInventory = ref(false);
 const showDamageFlash = ref(false);
+
+// Sanity Visuals
+const sanity = computed(() => gameStore.status.sanity);
+const showGlitch = computed(() => sanity.value <= 30);
+
+const sanityStyle = computed(() => {
+  const s = sanity.value;
+  let grayscale = 0;
+  let blur = 0;
+  let hue = 0;
+
+  if (s < 60) {
+    grayscale = (60 - s) / 60; // 0 to 1
+  }
+  if (s < 30) {
+    blur = (30 - s) / 10; // 0 to 3px
+    hue = (30 - s) * 2; // 0 to 60deg
+  }
+
+  return {
+    filter: `grayscale(${grayscale}) blur(${blur}px) hue-rotate(${hue}deg)`
+  };
+});
 
 // 打字机特效
 const { displayedText, isTyping, start, skip } = useTypewriter();
@@ -87,7 +117,23 @@ const formatCost = (cost) => {
   let text = '';
   if (cost.hp) text += `(-${cost.hp}HP) `;
   if (cost.hunger) text += `(-${cost.hunger}饱食) `;
+  if (cost.sanity) text += `(${cost.sanity > 0 ? '-' : '+'}${Math.abs(cost.sanity)}理智) `;
   return text;
+};
+
+// Glitch Helpers
+const randomChar = () => {
+  const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~';
+  return chars[Math.floor(Math.random() * chars.length)];
+};
+
+const randomGlitchStyle = () => {
+  return {
+    top: Math.random() * 100 + '%',
+    left: Math.random() * 100 + '%',
+    fontSize: (Math.random() * 40 + 20) + 'rpx',
+    opacity: Math.random()
+  };
 };
 </script>
 
@@ -100,6 +146,7 @@ const formatCost = (cost) => {
   flex-direction: column;
   color: #fff;
   overflow: hidden;
+  transition: filter 1s ease; // Smooth transition for sanity effects
 }
 
 .damage-flash {
@@ -116,6 +163,47 @@ const formatCost = (cost) => {
 
   &.active {
     opacity: 1;
+  }
+}
+
+// Glitch Overlay
+.glitch-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+}
+
+.glitch-char {
+  position: absolute;
+  color: rgba(255, 0, 255, 0.5);
+  font-family: monospace;
+  animation: twitch 0.1s infinite;
+}
+
+@keyframes twitch {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  25% {
+    transform: translate(2px, 2px);
+  }
+
+  50% {
+    transform: translate(-2px, -2px);
+  }
+
+  75% {
+    transform: translate(-2px, 2px);
+  }
+
+  100% {
+    transform: translate(2px, -2px);
   }
 }
 
@@ -136,6 +224,10 @@ const formatCost = (cost) => {
   color: #e0e0e0;
   text-align: justify;
   letter-spacing: 2rpx;
+
+  &.text-distort {
+    text-shadow: 2px 0 red, -2px 0 blue;
+  }
 }
 
 .cursor {

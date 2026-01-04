@@ -8,6 +8,7 @@ import {
 } from "@/utils/game/scenes_data";
 import { items, type Item, type ItemStats } from "@/utils/game/items_data";
 import { weatherData, type WeatherType } from "@/utils/game/weather_data";
+import { audioManager } from "@/utils/game/audio_manager"; // [NEW] Import Audio
 
 declare const uni: any;
 
@@ -24,8 +25,10 @@ interface GameState {
   status: {
     hp: number;
     hunger: number;
+    sanity: number; // [NEW] Sanity 0-100
     maxHp: number;
     maxHunger: number;
+    maxSanity: number;
   };
   inventory: Item[];
   equipment: {
@@ -56,8 +59,10 @@ export const useGameStore = defineStore("game", {
     status: {
       hp: 100,
       hunger: 100,
+      sanity: 100, // Init Sanity
       maxHp: 100,
       maxHunger: 100,
+      maxSanity: 100,
     },
 
     // 背包
@@ -81,7 +86,7 @@ export const useGameStore = defineStore("game", {
   getters: {
     currentScene: (state): Scene =>
       scenes[state.currentSceneId] || scenes["start_001"],
-    isAlive: (state): boolean => state.status.hp > 0,
+    isAlive: (state): boolean => state.status.hp > 0 && state.status.sanity > 0,
     currentWeatherInfo: (state) => weatherData[state.weather],
 
     // 统计总属性
@@ -104,7 +109,14 @@ export const useGameStore = defineStore("game", {
       this.gameState = "playing";
       this.currentSceneId = "start_001";
       this.nextSceneId = "";
-      this.status = { hp: 100, hunger: 100, maxHp: 100, maxHunger: 100 };
+      this.status = {
+        hp: 100,
+        hunger: 100,
+        sanity: 100,
+        maxHp: 100,
+        maxHunger: 100,
+        maxSanity: 100,
+      };
       this.player.days = 1;
       this.inventory = [];
       this.equipment = { head: null, body: null, feet: null, hand: null }; // Reset equipment
@@ -116,6 +128,9 @@ export const useGameStore = defineStore("game", {
       this.gainItem("food_001");
       // 送个登山杖体验一下
       this.gainItem("gear_poles_01");
+
+      // Init Audio
+      audioManager.playBGM("sunny");
 
       this.saveGame();
       console.log("Game Initialized");
@@ -153,6 +168,13 @@ export const useGameStore = defineStore("game", {
           this.status.hunger = Math.min(
             this.status.maxHunger,
             this.status.hunger + item.effect.hunger
+          );
+        }
+        if (item.effect.sanity) {
+          // Future proof
+          this.status.sanity = Math.min(
+            this.status.maxSanity,
+            this.status.sanity + item.effect.sanity
           );
         }
 
@@ -211,6 +233,13 @@ export const useGameStore = defineStore("game", {
       else if (rand < 0.95) this.weather = "snow";
       else this.weather = "storm";
 
+      // Update BGM based on weather
+      if (["storm", "snow"].includes(this.weather)) {
+        audioManager.playBGM("wind");
+      } else {
+        audioManager.playBGM("sunny");
+      }
+
       // 播报天气变化
       const info = weatherData[this.weather];
       // 降低频繁播报的打扰，仅在恶劣天气提示
@@ -263,6 +292,7 @@ export const useGameStore = defineStore("game", {
           // Special case: Storm event should override weather
           if (eventId === "evt_storm") {
             this.weather = "storm";
+            audioManager.playBGM("wind"); // Force Audio Update
           }
 
           this.moveToScene(eventId);
@@ -278,41 +308,50 @@ export const useGameStore = defineStore("game", {
       }
     },
 
-    // 扣减数值 (核心算法：天气系数 + 饥饿惩罚)
+    // 扣减数值 (核心算法：天气系数 + 饥饿惩罚 + 理智)
     applyCost(cost: ChoiceCost) {
       const weatherInfo = weatherData[this.weather];
       const coeff = weatherInfo.costCoeff;
       const stats = this.totalStats; // Get current equipment stats
 
-      // 1. 计算 hunger 消耗 (Move Speed modifier)
-      // Example: Speed 10 -> reduces cost by 10%
+      // 1. 计算 hunger 消耗
       let hungerCost = (cost.hunger || 0) * coeff;
       if (stats.speed && stats.speed > 0) {
-        const reduction = Math.min(0.5, stats.speed / 100); // Caps at 50% reduction
+        const reduction = Math.min(0.5, stats.speed / 100);
         hungerCost = hungerCost * (1 - reduction);
       }
       this.status.hunger = Math.max(0, this.status.hunger - hungerCost);
 
-      // 2. 计算 HP 消耗 (Warmth modifier)
+      // 2. 计算 HP 消耗
       let hpCost = (cost.hp || 0) * coeff;
-
-      // 天气额外掉血 (失温) - Warmth reduces this!
       if (weatherInfo.hpLeak) {
         let leak = weatherInfo.hpLeak;
-        // Each point of warmth reduces leak by 0.5 (example)
         if (stats.warmth) {
           leak = Math.max(0, leak - stats.warmth * 0.5);
         }
         hpCost += leak;
       }
-
-      // 饥饿惩罚：如果饿空了，额外扣血
       if (this.status.hunger <= 0) {
-        hpCost += 10; // 极度饥饿惩罚
+        hpCost += 10;
         uni.showToast({ title: "饥饿难耐，生命流失！", icon: "none" });
       }
-
       this.status.hp = Math.max(0, this.status.hp - hpCost);
+
+      // 3. 计算 Sanity 消耗 [NEW]
+      // Base cost from event
+      let sanityCost = cost.sanity || 0;
+
+      // Natural Decay in bad weather (Fog/Storm/Snow)
+      if (["fog", "storm", "snow"].includes(this.weather)) {
+        sanityCost += 2;
+      }
+
+      this.status.sanity = Math.max(0, this.status.sanity - sanityCost);
+      if (this.status.sanity <= 30) {
+        uni.showToast({ title: "意识模糊，耳边传来幻听...", icon: "none" });
+        // Audio SFX trigger only if losing sanity
+        if (sanityCost > 0) audioManager.playSFX("heartbeat");
+      }
     },
 
     // 特殊动作处理
@@ -328,16 +367,26 @@ export const useGameStore = defineStore("game", {
           if (this.weather === "sunny") heal = 50;
 
           this.status.hp = Math.min(this.status.maxHp, this.status.hp + heal);
+          this.status.sanity = Math.min(
+            this.status.maxSanity,
+            this.status.sanity + 20
+          ); // Sleep restores Sanity
           this.player.days += 1;
-          this.randomizeWeather(); // 睡一觉天气肯定变
-          uni.showToast({ title: `休息一晚 (恢复+${heal})`, icon: "none" });
+          this.randomizeWeather();
+          uni.showToast({
+            title: `休息一晚 (生命+${heal}, 理智+20)`,
+            icon: "none",
+          });
           this.saveGame();
           break;
         case "loot_supplies":
           this.gainItem("food_001");
           this.gainItem("water_001");
           if (Math.random() > 0.5) this.gainItem("gear_jacket_01"); // Lucky Loot
-          uni.showToast({ title: "找到了一些物资", icon: "none" });
+          // Looting bodies costs sanity
+          this.status.sanity = Math.max(0, this.status.sanity - 10);
+          audioManager.playSFX("heartbeat"); // Scared SFX
+          uni.showToast({ title: "获得物资 (理智-10)", icon: "none" });
           break;
         case "check_gear":
           uni.showToast({ title: "请打开右上角背包查看", icon: "none" });
@@ -361,6 +410,13 @@ export const useGameStore = defineStore("game", {
     checkSurvival(): boolean {
       if (this.status.hp <= 0) {
         this.die(this.status.hunger <= 0 ? "饥寒交迫而死" : "体力耗尽");
+        audioManager.stopBGM(); // Stop music
+        return false;
+      }
+      if (this.status.sanity <= 0) {
+        this.die("精神崩溃，产生幻觉坠崖");
+        audioManager.stopBGM();
+        audioManager.playSFX("scream"); // Scream
         return false;
       }
       return true;
@@ -405,6 +461,10 @@ export const useGameStore = defineStore("game", {
           this.nextSceneId = saved.nextSceneId || "";
           this.player = saved.player;
           this.status = saved.status;
+          // Fallback for old save data without sanity
+          if (this.status.sanity === undefined) this.status.sanity = 100;
+          if (this.status.maxSanity === undefined) this.status.maxSanity = 100;
+
           this.inventory = saved.inventory || [];
           this.equipment = saved.equipment || {
             head: null,
@@ -414,6 +474,14 @@ export const useGameStore = defineStore("game", {
           }; // Load equipment
           this.weather = saved.weather || "sunny";
           this.history = saved.history || [];
+
+          // Restore Audio
+          if (this.gameState === "playing") {
+            audioManager.playBGM(
+              ["storm", "snow"].includes(this.weather) ? "wind" : "sunny"
+            );
+          }
+
           console.log("Game Loaded");
           return true;
         }
