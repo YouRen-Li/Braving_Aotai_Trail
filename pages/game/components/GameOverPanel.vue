@@ -15,7 +15,7 @@
                 <text class="reason-value">{{ deathReason }}</text>
 
                 <view class="rank-badge">
-                    <text class="rank-text">评价: {{ rank }}</text>
+                    <text class="rank-text">称号: {{ evaluationTitle }}</text>
                 </view>
             </view>
 
@@ -29,6 +29,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useGameStore } from '@/stores/modules/game';
+import { scenes } from '@/utils/game/scenes_data'; // Import scenes to look up titles/text if needed, but we used IDs
 
 const gameStore = useGameStore();
 
@@ -41,31 +42,62 @@ watch(() => gameStore.gameState, (newVal) => {
         // Give user 2 seconds to read the death text before showing modal
         setTimeout(() => {
             visible.value = true;
-        }, 4000);
+        }, 3000); // 3 seconds
     } else {
         visible.value = false;
     }
 }, { immediate: true });
 
-// Extract death reason from history or just show a generic message if missing
-const deathReason = computed(() => {
-    // Determine reason from history last entry or assume generic
-    // In die() we pushed "死因: ..."
+const endingId = computed(() => {
     const history = gameStore.history;
     if (history.length > 0) {
         const last = history[history.length - 1];
-        if (last.startsWith('死因:')) return last.split(':')[1];
+        if (last.startsWith('结局:')) return last.split(':')[1].trim();
+        if (last.startsWith('死因:')) return last.split(':')[1].trim(); // Compatible
     }
-    return '在这片荒野中永远沉睡...';
+    return '';
 });
 
-const rank = computed(() => {
+// Extract death reason text (Narrative) from the ID
+const deathReason = computed(() => {
+    const eid = endingId.value;
+    if (!eid) return '在这片荒野中永远沉睡...';
+
+    // Map ID to a short summary if possible, or just use a poetic line
+    const map = {
+        'dead_001': '长眠于秦岭深处',
+        'dead_starve': '倒在了寻找食物的路上',
+        'dead_cold': '失温，在幻觉中睡去',
+        'dead_sanity': '精神崩溃，迷失在风雪中',
+        'end_lost_23km': '走进跑道，不知所踪',
+        'end_caught': '非法穿越被劝返',
+        'end_rescue': '体力不支获救',
+        'end_retreat': '知难而退，保留火种',
+        'end_success': '完成小鳌太穿越',
+        'end_game_cleared': '完成鳌太全线穿越',
+    };
+    return map[eid] || '旅途终结';
+});
+
+const evaluationTitle = computed(() => {
+    const eid = endingId.value;
     const d = days.value;
-    if (d < 3) return 'D (菜鸟)';
-    if (d < 7) return 'C (初学者)';
-    if (d < 15) return 'B (生存者)';
-    if (d < 30) return 'A (探险家)';
-    return 'S (传奇)';
+
+    // 1. Success Outcomes
+    if (eid === 'end_game_cleared') return '鳌太征服者'; // Conqueror
+    if (eid === 'end_success') return '雪线行者'; // Snow Walker
+    if (eid === 'end_retreat') return '明智的生存者'; // Wise Survivor (High praise for retreating)
+
+    // 2. Failure Outcomes specific
+    if (eid === 'end_caught') return '受训斥的驴友';
+    if (eid === 'end_rescue') return '幸存者';
+    if (eid === 'end_lost_23km') return '失落的灵魂';
+
+    // 3. Deaths - Based on days
+    if (d < 2) return '初涉险阻'; // Beginner
+    if (d < 4) return '莽撞的行者'; // Hasty
+    if (d < 6) return '风雪归人'; // Snow Returner
+    return '秦岭之魂'; // Soul of Qinling (High respect for long survival)
 });
 
 const onRestart = () => {
