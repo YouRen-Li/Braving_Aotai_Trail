@@ -5,14 +5,21 @@ export interface ItemEffect {
   msg?: string; // effect description message
 }
 
+export interface ItemStats {
+  warmth?: number; // Reduces HP loss from cold
+  speed?: number; // Reduces Hunger loss from movement
+}
+
 export interface Item {
   id: string;
   name: string;
   description: string;
-  type: "consumable" | "tool" | "material";
+  type: "consumable" | "tool" | "material" | "gear";
+  slot?: "head" | "body" | "feet" | "hand";
   icon?: string; // emoji or image path
   stackable?: boolean;
   effect?: ItemEffect;
+  stats?: ItemStats;
 }
 
 export const items: Record<string, Item> = {
@@ -48,5 +55,33 @@ export const items: Record<string, Item> = {
       hp: 20,
       msg: "伤口经过处理不再剧烈疼痛。(生命+20)",
     },
+  },
+  // --- GEAR ---
+  gear_jacket_01: {
+    id: "gear_jacket_01",
+    name: "冲锋衣",
+    description: "专业的Gore-Tex冲锋衣，防风防水，是抵御恶劣天气的关键。",
+    type: "gear",
+    slot: "body",
+    icon: "🧥",
+    stats: { warmth: 15 },
+  },
+  gear_boots_01: {
+    id: "gear_boots_01",
+    name: "登山鞋",
+    description: "抓地力极强的重装徒步鞋，能有效节省体力。",
+    type: "gear",
+    slot: "feet",
+    icon: "🥾",
+    stats: { speed: 10 },
+  },
+  gear_poles_01: {
+    id: "gear_poles_01",
+    name: "登山杖",
+    description: "碳纤维登山杖，能有效分担膝盖压力。",
+    type: "gear",
+    slot: "hand",
+    icon: "🦯",
+    stats: { speed: 5 },
   },
 };

@@ -6,7 +6,7 @@ import {
   type ChoiceCost,
   type Scene,
 } from "@/utils/game/scenes_data";
-import { items, type Item } from "@/utils/game/items_data";
+import { items, type Item, type ItemStats } from "@/utils/game/items_data";
 import { weatherData, type WeatherType } from "@/utils/game/weather_data";
 
 declare const uni: any;
@@ -28,6 +28,12 @@ interface GameState {
     maxHunger: number;
   };
   inventory: Item[];
+  equipment: {
+    head: Item | null;
+    body: Item | null;
+    feet: Item | null;
+    hand: Item | null;
+  };
   weather: WeatherType;
   history: string[];
 }
@@ -57,6 +63,14 @@ export const useGameStore = defineStore("game", {
     // 背包
     inventory: [],
 
+    // 装备栏
+    equipment: {
+      head: null,
+      body: null,
+      feet: null,
+      hand: null,
+    },
+
     // 天气
     weather: "sunny",
 
@@ -69,6 +83,19 @@ export const useGameStore = defineStore("game", {
       scenes[state.currentSceneId] || scenes["start_001"],
     isAlive: (state): boolean => state.status.hp > 0,
     currentWeatherInfo: (state) => weatherData[state.weather],
+
+    // 统计总属性
+    totalStats: (state): ItemStats => {
+      let warmth = 0;
+      let speed = 0;
+      Object.values(state.equipment).forEach((item) => {
+        if (item && item.stats) {
+          warmth += item.stats.warmth || 0;
+          speed += item.stats.speed || 0;
+        }
+      });
+      return { warmth, speed };
+    },
   },
 
   actions: {
@@ -80,12 +107,15 @@ export const useGameStore = defineStore("game", {
       this.status = { hp: 100, hunger: 100, maxHp: 100, maxHunger: 100 };
       this.player.days = 1;
       this.inventory = [];
+      this.equipment = { head: null, body: null, feet: null, hand: null }; // Reset equipment
       this.weather = "sunny";
       this.history = [];
 
       // 开局送点物资
       this.gainItem("water_001");
       this.gainItem("food_001");
+      // 送个登山杖体验一下
+      this.gainItem("gear_poles_01");
 
       this.saveGame();
       console.log("Game Initialized");
@@ -101,10 +131,15 @@ export const useGameStore = defineStore("game", {
       }
     },
 
-    // 使用物品
+    // 使用/装备物品
     useItem(index: number) {
       const item = this.inventory[index];
       if (!item) return;
+
+      if (item.type === "gear" && item.slot) {
+        this.equipItem(index);
+        return;
+      }
 
       if (item.type === "consumable" && item.effect) {
         // 应用效果
@@ -131,6 +166,39 @@ export const useGameStore = defineStore("game", {
         this.saveGame(); // Save on use item
       } else {
         uni.showToast({ title: "暂时无法使用该物品", icon: "none" });
+      }
+    },
+
+    // 装备逻辑
+    equipItem(index: number) {
+      const item = this.inventory[index];
+      if (!item || !item.slot) return;
+
+      const slot = item.slot;
+      const currentEquip = this.equipment[slot];
+
+      // 1. 从背包移除新装备
+      this.inventory.splice(index, 1);
+
+      // 2. 如果当前有装备，卸下放回背包
+      if (currentEquip) {
+        this.inventory.push(currentEquip);
+      }
+
+      // 3. 穿戴新装备
+      this.equipment[slot] = item;
+      uni.showToast({ title: `装备: ${item.name}`, icon: "none" });
+      this.saveGame();
+    },
+
+    // 卸下逻辑
+    unequipItem(slot: "head" | "body" | "feet" | "hand") {
+      const item = this.equipment[slot];
+      if (item) {
+        this.equipment[slot] = null;
+        this.inventory.push(item);
+        uni.showToast({ title: `卸下: ${item.name}`, icon: "none" });
+        this.saveGame();
       }
     },
 
@@ -214,17 +282,28 @@ export const useGameStore = defineStore("game", {
     applyCost(cost: ChoiceCost) {
       const weatherInfo = weatherData[this.weather];
       const coeff = weatherInfo.costCoeff;
+      const stats = this.totalStats; // Get current equipment stats
 
-      // 1. 计算 hunger 消耗
+      // 1. 计算 hunger 消耗 (Move Speed modifier)
+      // Example: Speed 10 -> reduces cost by 10%
       let hungerCost = (cost.hunger || 0) * coeff;
+      if (stats.speed && stats.speed > 0) {
+        const reduction = Math.min(0.5, stats.speed / 100); // Caps at 50% reduction
+        hungerCost = hungerCost * (1 - reduction);
+      }
       this.status.hunger = Math.max(0, this.status.hunger - hungerCost);
 
-      // 2. 计算 HP 消耗
+      // 2. 计算 HP 消耗 (Warmth modifier)
       let hpCost = (cost.hp || 0) * coeff;
 
-      // 天气额外掉血 (失温)
+      // 天气额外掉血 (失温) - Warmth reduces this!
       if (weatherInfo.hpLeak) {
-        hpCost += weatherInfo.hpLeak;
+        let leak = weatherInfo.hpLeak;
+        // Each point of warmth reduces leak by 0.5 (example)
+        if (stats.warmth) {
+          leak = Math.max(0, leak - stats.warmth * 0.5);
+        }
+        hpCost += leak;
       }
 
       // 饥饿惩罚：如果饿空了，额外扣血
@@ -257,6 +336,7 @@ export const useGameStore = defineStore("game", {
         case "loot_supplies":
           this.gainItem("food_001");
           this.gainItem("water_001");
+          if (Math.random() > 0.5) this.gainItem("gear_jacket_01"); // Lucky Loot
           uni.showToast({ title: "找到了一些物资", icon: "none" });
           break;
         case "check_gear":
@@ -306,6 +386,7 @@ export const useGameStore = defineStore("game", {
           player: this.player,
           status: this.status,
           inventory: this.inventory,
+          equipment: this.equipment, // Save equipment
           weather: this.weather,
           history: this.history,
         };
@@ -325,6 +406,12 @@ export const useGameStore = defineStore("game", {
           this.player = saved.player;
           this.status = saved.status;
           this.inventory = saved.inventory || [];
+          this.equipment = saved.equipment || {
+            head: null,
+            body: null,
+            feet: null,
+            hand: null,
+          }; // Load equipment
           this.weather = saved.weather || "sunny";
           this.history = saved.history || [];
           console.log("Game Loaded");
