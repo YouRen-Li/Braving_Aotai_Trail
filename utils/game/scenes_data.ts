@@ -56,7 +56,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_river_crossing: {
     id: "node_river_crossing",
-    text: "【过河】路断了，一条冰冷的溪流挡在面前。石头上结了薄薄的冰。",
+    text: "唯一的补水点。泉水冰冷刺骨，但能救命。你需要在这里补充水源。",
     bg: "loc_river", // Updated
     choices: [
       {
@@ -74,7 +74,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_forest_entry: {
     id: "node_forest_entry",
-    text: "【红桦林】你正式进入了爬升路段。四周是茂密的红桦林，坡度陡然提升。呼吸开始变得急促，心跳声在耳边回响。",
+    text: "你正式进入了爬升路段。四周是茂密的红桦林，坡度陡然提升。呼吸开始变得急促，心跳声在耳边回响。",
     bg: "loc_red_birch",
     choices: [
       {
@@ -93,7 +93,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_forest_climb: {
     id: "node_forest_climb",
-    text: "【林海深处】海拔上升到2600米。树木变得稀疏，空气也变得稀薄。每迈出一步都需要大口喘气。",
+    text: "海拔上升到2600米。树木变得稀疏，空气也变得稀薄。每迈出一步都需要大口喘气。",
     bg: "loc_forest",
     choices: [
       { text: "咬牙坚持", target: "node_2900", cost: { hunger: 15, hp: 5 } },
@@ -107,7 +107,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_2900: {
     id: "node_2900",
-    text: "【2900营地】终于，你到达了第一晚的落脚点。这里地势相对平坦，是一片开阔的草甸。夕阳下的秦岭美得令人窒息。",
+    text: "终于，你到达了第一晚的落脚点。这里地势相对平坦，是一片开阔的草甸。夕阳下的秦岭美得令人窒息。",
     bg: "loc_sunset_meadow",
     choices: [
       { text: "搭帐篷过夜", action: "rest", target: "node_2900_morning" },
@@ -122,7 +122,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_2900_morning: {
     id: "node_2900_morning",
-    text: "【2900营地·清晨】清晨的阳光洒在帐篷上。昨晚虽然寒冷，但你终于恢复了一些体力。是时候出发了。",
+    text: "清晨的阳光洒在帐篷上。昨晚虽然寒冷，但你终于恢复了一些体力。是时候出发了。",
     bg: "loc_sunset_meadow",
     choices: [{ text: "拔营前往盆景园", target: "node_penjing_ascent" }],
   },
@@ -131,7 +131,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_penjing_ascent: {
     id: "node_penjing_ascent",
-    text: "【乱石坡】离开2900营地，路面变成了破碎的石块。这就是“石海”的雏形。脚下容易打滑，极其消耗体力。",
+    text: "离开2900营地，路面变成了破碎的石块。这就是“石海”的雏形。脚下容易打滑，极其消耗体力。",
     bg: "loc_stone_sea",
     choices: [
       {
@@ -145,7 +145,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_penjing: {
     id: "node_penjing",
-    text: "【盆景园】海拔3100米。这里的太白红杉因长期受大风吹袭，树冠平整如削，姿态奇异，如同天然盆景园。",
+    text: "海拔3100米。这里的太白红杉因长期受大风吹袭，树冠平整如削，姿态奇异，如同天然盆景园。",
     bg: "loc_penjing",
     choices: [
       { text: "穿过怪树林", target: "node_baiqi_start", cost: { hunger: 10 } },
@@ -159,7 +159,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_baiqi_start: {
     id: "node_baiqi_start",
-    text: "【白起梁起点】树木消失了，眼前是裸露的山脊线。风声仿佛千军万马在呼啸，“白起梁”因此得名。体感温度骤降。",
+    text: "树木消失了，眼前是裸露的山脊线。风声仿佛千军万马在呼啸，“白起梁”因此得名。体感温度骤降。",
     bg: "loc_ridge",
     choices: [
       {
@@ -177,7 +177,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_baiqi_middle: {
     id: "node_baiqi_middle",
-    text: "【白起梁中段】漫长、枯燥、狂风。左边是万丈深渊，右边是滚滚云海。这种单调的行走最容易消磨意志。",
+    text: "风像刀子一样割在脸上。两侧是万丈深渊，稍有不慎就会坠落。必须全神贯注。这种单调的行走最容易消磨意志。",
     bg: "loc_ridge",
     choices: [
       {
@@ -195,7 +195,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_nav_stand: {
     id: "node_nav_stand",
-    text: "【鳌山导航架】海拔3475米。这架废弃的导航架是鳌山的标志。风太大了，你甚至无法站稳。",
+    text: "海拔3475米。这架废弃的导航架是鳌山的标志。风太大了，你甚至无法站稳。",
     bg: "loc_nav_stand", // Updated
     choices: [
       {
@@ -215,7 +215,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_maijie_descent: {
     id: "node_maijie_descent",
-    text: "【麦秸岭下撤】过了鳌山，路况突变。前方是陡峭的麦秸岭，你需要从这满是碎石的陡坡上下去。",
+    text: "过了鳌山，路况突变。前方是陡峭的麦秸岭，你需要从这满是碎石的陡坡上下去。",
     bg: "loc_ridge",
     choices: [
       {
@@ -233,7 +233,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_knife_ridge: {
     id: "node_knife_ridge",
-    text: "【刀刃梁】路如其名，山脊窄得只能容下一只脚。两边都是深不见底的悬崖。一阵横风吹来，你晃了一下。",
+    text: "路如其名，山脊窄得只能容下一只脚。两边都是深不见底的悬崖。一阵横风吹来，你晃了一下。",
     bg: "loc_knife_ridge",
     choices: [
       {
@@ -251,7 +251,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_shuiwozi_source: {
     id: "node_shuiwozi_source",
-    text: "【寻找水源】翻过刀刃梁，你听到了流水声。在乱石堆下方，有一股细小的清泉。这是救命水。",
+    text: "翻过刀刃梁，你听到了流水声。在乱石堆下方，有一股细小的清泉。这是救命水。",
     bg: "loc_spring_water",
     choices: [
       {
@@ -265,7 +265,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_shuiwozi_camp: {
     id: "node_shuiwozi_camp",
-    text: "【水窝子营地】这里是一个相对避风的鞍部。许多队伍会选择在这里扎营。地上有些前人留下的气罐垃圾。",
+    text: "这里是一个相对避风的鞍部。许多队伍会选择在这里扎营。地上有些前人留下的气罐垃圾。",
     bg: "loc_camp",
     choices: [
       { text: "扎营休整", action: "rest", target: "node_shuiwozi_morning" },
@@ -280,7 +280,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_shuiwozi_morning: {
     id: "node_shuiwozi_morning",
-    text: "【水窝子·清晨】这片鞍部在早晨显得格外宁静。远处的云海在翻腾。你收拾好垃圾，准备迎接最艰难的路段。",
+    text: "这片鞍部在早晨显得格外宁静。远处的云海在翻腾。你收拾好垃圾，准备迎接最艰难的路段。",
     bg: "loc_camp",
     choices: [{ text: "出发，穿越飞机梁", target: "node_plane_wreck" }],
   },
@@ -289,7 +289,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_plane_wreck: {
     id: "node_plane_wreck",
-    text: "【飞机梁】你看到了一些散落的金属碎片，那是多年前坠毁的战机残骸。这里常年大雾，仿佛是被诅咒之地。",
+    text: "你看到了一些散落的金属碎片，那是多年前坠毁的战机残骸。这里常年大雾，仿佛是被诅咒之地。",
     bg: "loc_plane_wreck", // Updated
     choices: [
       { text: "查看残骸", target: "node_stone_sea", cost: { sanity: 5 } },
@@ -303,7 +303,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_stone_sea: {
     id: "node_stone_sea",
-    text: "【无尽石海】眼前是没有尽头的乱石堆。每块石头都有半人高，且松动不稳。一旦卡住脚就是骨折。",
+    text: "眼前是没有尽头的乱石堆。每块石头都有半人高，且松动不稳。一旦卡住脚就是骨折。",
     bg: "loc_stone_sea",
     choices: [
       {
@@ -321,7 +321,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_2800: {
     id: "node_2800",
-    text: "【2800营地】海拔重新降到2800米。这里树木茂密，光线阴暗。压抑的氛围让你只想尽快离开。",
+    text: "海拔重新降到2800米。这里树木茂密，光线阴暗。压抑的氛围让你只想尽快离开。",
     bg: "loc_forest",
     choices: [
       {
@@ -335,7 +335,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_fog_entry: {
     id: "node_fog_entry",
-    text: "【迷雾入口】走进冷杉林，浓雾突然涌来，能见度瞬间降到五米以内。路迹消失了。",
+    text: "走进冷杉林，浓雾突然涌来，能见度瞬间降到五米以内。路迹消失了。",
     bg: "bg_fog",
     choices: [
       {
@@ -349,7 +349,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_fog_deep: {
     id: "node_fog_deep",
-    text: "【迷魂阵】你绕回了原地？那棵枯树刚才好像见过。恐惧开始在心中蔓延。",
+    text: "能见度不足5米。你来到了著名的迷魂阵。四周的景色一模一样，没有路标，只有风声。",
     bg: "bg_fog",
     choices: [
       {
@@ -369,7 +369,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_pyramid: {
     id: "node_pyramid",
-    text: "【金字塔】雾气散去，一座金字塔般的角峰耸立在眼前。这里是太白山的南坡。",
+    text: "一片开阔的草甸，夕阳将云海染成金色。这里是第一天的理想营地，但风很大。",
     bg: "loc_ridge",
     choices: [
       {
@@ -382,7 +382,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_xitaibai: {
     id: "node_xitaibai",
-    text: "【西太白】这里有雷公庙的断壁残垣。古人敬畏自然，在此设庙。太白绝顶就在前方了。",
+    text: "这里有雷公庙的断壁残垣。古人敬畏自然，在此设庙。太白绝顶就在前方了。",
     bg: "loc_temple", // Updated
     choices: [
       {
@@ -396,7 +396,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_daye_lake: {
     id: "node_daye_lake",
-    text: "【大爷海】翻过最后一个垭口，那抹幽蓝的湖水出现在眼前。海拔3590米的圣湖。许多人到了这里，都会忍不住落泪。",
+    text: "翻过最后一个垭口，那抹幽蓝的湖水出现在眼前。海拔3590米的圣湖。许多人到了这里，都会忍不住落泪。",
     bg: "loc_daye_lake",
     choices: [
       { text: "在湖边洗把脸", action: "rest", target: "node_baxian_ascent" },
@@ -410,7 +410,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_baxian_ascent: {
     id: "node_baxian_ascent",
-    text: "【最后的冲顶】只剩下最后一百多米的拔高。碎石坡很滑，每走一步退半步。这是最后的考验。",
+    text: "只剩下最后一百多米的拔高。碎石坡很滑，每走一步退半步。这是最后的考验。",
     bg: "loc_stone_sea",
     choices: [
       {
@@ -423,7 +423,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_baxiantai: {
     id: "node_baxiantai",
-    text: "【拔仙台】海拔3767.2米！你站上了秦岭之巅。云海在你脚下翻腾，天地之间，只有风声和你沉重的呼吸声。",
+    text: "海拔3767.2米！你站上了秦岭之巅。云海在你脚下翻腾，天地之间，只有风声和你沉重的呼吸声。",
     bg: "bg_sunny",
     choices: [{ text: "向群山致敬，下山", target: "end_success" }],
   },
@@ -449,7 +449,7 @@ const mapScenes: Record<string, Scene> = {
   },
   dead_starve: {
     id: "dead_starve",
-    text: "【力竭】食物耗尽，体力透支。你倒在了路上，再也没有力气站起来。",
+    text: "天色渐晚，雾气开始上涌。你来到了红桦林。枯红的树皮如血般剥落，风吹过发出沙沙的声响。",
     bg: "bg_snow",
     choices: [{ text: "重新开始", action: "restart" }],
   },
@@ -483,7 +483,7 @@ const mapScenes: Record<string, Scene> = {
 const eventScenes: Record<string, Scene> = {
   evt_hiker: {
     id: "evt_hiker",
-    text: "【随机事件】浓雾中，你隐约听到前方有呼救声。走近一看，是一个眼神涣散的落单驴友。他说同伴走丢了，自己也没水了。",
+    text: "浓雾中，你隐约听到前方有呼救声。走近一看，是一个眼神涣散的落单驴友。他说同伴走丢了，自己也没水了。",
     bg: "bg_fog",
     choices: [
       {
@@ -501,7 +501,7 @@ const eventScenes: Record<string, Scene> = {
   },
   evt_tent: {
     id: "evt_tent",
-    text: "【探索】你发现一顶完好的帐篷搭在路边，但没有任何动静。走近时，心里涌起一股不祥的预感。",
+    text: "你发现一顶完好的帐篷搭在路边，但没有任何动静。走近时，心里涌起一股不祥的预感。",
     bg: "loc_camp",
     choices: [
       { text: "拉开帐篷查看", target: "evt_tent_result", cost: { sanity: 5 } },
@@ -516,7 +516,7 @@ const eventScenes: Record<string, Scene> = {
   },
   evt_storm: {
     id: "evt_storm",
-    text: "【突发恶劣天气】狂风骤起，暴雪瞬间吞没了视线！这是最危险的时刻。强行赶路极易失温死亡。",
+    text: "狂风骤起，暴雪瞬间吞没了视线！这是最危险的时刻。强行赶路极易失温死亡。",
     bg: "bg_storm",
     choices: [
       {
@@ -535,13 +535,13 @@ const eventScenes: Record<string, Scene> = {
 
   node_sos_fail: {
     id: "node_sos_fail",
-    text: "【求救失败】电话那头只有嘈杂的电流声。在这种恶劣天气和地形下，信号很难接通。即使接通，直升机也无法在风雪中起飞。",
+    text: "求救失败。电话那头只有嘈杂的电流声。在这种恶劣天气和地形下，信号很难接通。即使接通，直升机也无法在风雪中起飞。",
     bg: "bg_storm",
     choices: [{ text: "收起电话，另寻出路", target: "resume" }],
   },
   evt_ranger: {
     id: "evt_ranger",
-    text: "【突发事件】前方路口出现了几个穿迷彩服的身影——是自然保护区的巡山队！鳌太线全线封禁，你这是在非法穿越。",
+    text: "前方路口出现了几个穿迷彩服的身影——是自然保护区的巡山队！鳌太线全线封禁，你这是在非法穿越。",
     bg: "loc_forest",
     choices: [
       { text: "配合执法，接受处罚", target: "end_caught" },
@@ -554,7 +554,7 @@ const eventScenes: Record<string, Scene> = {
   },
   evt_body: {
     id: "evt_body",
-    text: "【恐怖发现】在一块巨石的缝隙中，你发现了一具蜷缩的遗体。他衣着单薄，似乎生前有“反常脱衣”现象。这残酷的一幕让你不寒而栗。",
+    text: "在一块巨石的缝隙中，你发现了一具蜷缩的遗体。他衣着单薄，似乎生前有“反常脱衣”现象。这残酷的一幕让你不寒而栗。",
     bg: "loc_stone_sea",
     choices: [
       { text: "搜寻遗物 (理智-20)", action: "loot_supplies", target: "resume" },
@@ -563,7 +563,7 @@ const eventScenes: Record<string, Scene> = {
   },
   evt_takin: {
     id: "evt_takin",
-    text: "【猛兽挡道】一头体型硕大的秦岭羚牛挡在了由独木桥上。它盯着你，鼻孔喷着白气。这种独行公牛极具攻击性。",
+    text: "一头体型硕大的秦岭羚牛挡在了由独木桥上。它盯着你，鼻孔喷着白气。这种独行公牛极具攻击性。",
     bg: "loc_forest",
     choices: [
       {

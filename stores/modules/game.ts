@@ -383,9 +383,8 @@ export const useGameStore = defineStore("game", {
     handleAction(action: string) {
       switch (action) {
         case "restart":
-          // Re-init with same role if possible, or just default
-          // Ideally restart goes back to role select, but here let's just use default or current
-          this.initGame(this.player.roleId);
+          // Return to Home Page
+          uni.reLaunch({ url: "/pages/index/index" });
           break;
         case "rest":
           // 3. 休息回血，消耗饱食度
