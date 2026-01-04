@@ -51,12 +51,6 @@
           <text class="btn-text-secondary">继续徒步</text>
         </view>
 
-        <!-- 探险手记按钮 - 次按钮 -->
-        <view class="btn btn-secondary" @click="handleJournal">
-          <text class="btn-icon-secondary">📖</text>
-          <text class="btn-text-secondary">探险手记</text>
-        </view>
-
         <!-- 关于游戏按钮 - 文字按钮 -->
         <view class="btn btn-text-link" @click="handleAbout">
           <text class="btn-icon-link">ℹ</text>
@@ -267,10 +261,11 @@ const confirmReset = () => {
   font-size: 96rpx;
   font-weight: 800;
   color: #ffffff;
-  letter-spacing: 12rpx;
+  letter-spacing: 16rpx;
   text-shadow:
     0 4rpx 10rpx rgba(0, 0, 0, 0.3),
-    0 10rpx 40rpx rgba(0, 0, 0, 0.5);
+    0 10rpx 40rpx rgba(0, 0, 0, 0.5),
+    0 0 80rpx rgba(100, 200, 255, 0.3);
   margin-bottom: 40rpx;
   background: linear-gradient(180deg, #ffffff 30%, #e0e6ed 100%);
   -webkit-background-clip: text;
@@ -322,7 +317,7 @@ const confirmReset = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28rpx;
+  gap: 40rpx;
   width: 100%;
   max-width: 520rpx;
 }
@@ -333,6 +328,8 @@ const confirmReset = () => {
   justify-content: center;
   gap: 16rpx;
   width: 100%;
+  height: 116rpx;
+  /* Fixed height for consistency */
   transition: all 0.2s ease;
 
   &:active {
@@ -342,7 +339,7 @@ const confirmReset = () => {
 
 /* 主按钮 - 毛玻璃质感 */
 .btn-primary {
-  padding: 34rpx 60rpx;
+  padding: 0 60rpx;
   /* 半透明白色背景 */
   background: rgba(255, 255, 255, 0.12);
   /* 模糊滤镜实现毛玻璃 */
@@ -387,7 +384,7 @@ const confirmReset = () => {
 
 /* 次按钮 - 深色毛玻璃 */
 .btn-secondary {
-  padding: 32rpx 60rpx;
+  padding: 0 60rpx;
   background: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(10rpx);
   -webkit-backdrop-filter: blur(10rpx);
@@ -407,12 +404,12 @@ const confirmReset = () => {
 }
 
 .btn-icon-secondary {
-  font-size: 30rpx;
+  font-size: 32rpx;
   color: rgba(255, 255, 255, 0.7);
 }
 
 .btn-text-secondary {
-  font-size: 30rpx;
+  font-size: 34rpx;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.8);
   letter-spacing: 8rpx;
