@@ -28,6 +28,10 @@
     <!-- 结算弹窗 -->
     <game-over-panel />
 
+    <!-- 游戏通知 -->
+    <game-notification :visible="gameStore.notification.visible" :message="gameStore.notification.message"
+      :type="gameStore.notification.type" />
+
     <!-- 剧情显示区 -->
     <scroll-view scroll-y class="story-area" @click="handleTextClick">
       <view class="story-content">
@@ -59,7 +63,8 @@ import BagButton from './components/BagButton.vue';
 import InventoryPanel from './components/InventoryPanel.vue';
 import GameOverPanel from './components/GameOverPanel.vue';
 import BackgroundLayer from './components/BackgroundLayer.vue';
-import DayNightOverlay from './components/DayNightOverlay.vue'; // [NEW]
+import DayNightOverlay from './components/DayNightOverlay.vue';
+import GameNotification from './components/GameNotification.vue'; // [NEW]
 import { useTypewriter } from '@/utils/composables/useTypewriter';
 import { getCorruptedText } from '@/utils/game/sanity_utils'; // [NEW]
 

@@ -86,6 +86,13 @@
                 <view class="btn-glitch"></view>
             </view>
         </view>
+        <!-- 全屏转场遮罩 -->
+        <view class="transition-overlay" v-if="isTransitioning">
+            <text class="transition-text">正在前往登山口...</text>
+            <view class="loading-bar">
+                <view class="loading-progress"></view>
+            </view>
+        </view>
     </view>
 </template>
 
@@ -98,6 +105,7 @@ import { useGameStore } from '@/stores/modules/game';
 const gameStore = useGameStore();
 
 const currentIndex = ref(0);
+const isTransitioning = ref(false); // [NEW] Transition state
 const currentRole = computed(() => roles[currentIndex.value]);
 
 onMounted(() => {
@@ -117,27 +125,24 @@ const getRoleItemNames = (role) => {
 
 const confirmSelection = () => {
     try {
-        console.log('Deploy button clicked');
-        const roleId = currentRole.value.id;
-        console.log('Selected Role:', roleId);
+        if (isTransitioning.value) return; // Prevent double click
 
+        const roleId = currentRole.value.id;
         gameStore.initGame(roleId);
 
-        uni.showToast({
-            title: 'DEPLOYING...',
-            icon: 'none',
-            duration: 1000
-        });
+        // Start Transition
+        isTransitioning.value = true;
 
+        // Navigate after animation
         setTimeout(() => {
             uni.navigateTo({
                 url: '/pages/game/index',
                 fail: (err) => {
                     console.error('Navigation failed:', err);
-                    uni.showToast({ title: 'Nav Error: ' + JSON.stringify(err), icon: 'none' });
+                    isTransitioning.value = false;
                 }
             });
-        }, 500); // Small delay for effect
+        }, 2000); // 2 seconds for the cinematic feel
     } catch (e) {
         console.error('Error in confirmSelection:', e);
         uni.showToast({ title: 'Error: ' + e.message, icon: 'none' });
@@ -554,6 +559,84 @@ const confirmSelection = () => {
 
     100% {
         transform: translateX(100%);
+    }
+}
+
+/* Transition Overlay Styles */
+.transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.transition-text {
+    color: #fff;
+    font-size: 40rpx;
+    /* Larger text */
+    letter-spacing: 8rpx;
+    margin-bottom: 60rpx;
+    font-weight: 700;
+    animation: pulseText 2s infinite;
+}
+
+.loading-bar {
+    width: 400rpx;
+    height: 4rpx;
+    background: #333;
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: #fff;
+    transform: translateX(-100%);
+    animation: loadingSlide 2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes pulseText {
+
+    0%,
+    100% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 20rpx rgba(255, 255, 255, 0.5);
+    }
+}
+
+@keyframes loadingSlide {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(0);
     }
 }
 </style>

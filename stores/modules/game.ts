@@ -48,6 +48,7 @@ interface GameState {
     shuiwozi_water: boolean; // true = has water
     liang2_blocked: boolean; // true = landslide
   };
+  notification: { visible: boolean; message: string; type: string }; // [NEW]
 }
 
 export const useGameStore = defineStore("game", {
@@ -183,6 +184,8 @@ export const useGameStore = defineStore("game", {
       this.weather = "sunny";
       this.history = [];
 
+      this.notification = { visible: false, message: "", type: "normal" }; // [NEW] Notification State
+
       // Items from Role
       role.items.forEach((itemId: string) => this.gainItem(itemId));
 
@@ -207,7 +210,7 @@ export const useGameStore = defineStore("game", {
         this.inventory.push({ ...item });
         // Don't toast during init
         if (this.gameState === "playing" && this.history.length > 0) {
-          uni.showToast({ title: `获得: ${item.name}`, icon: "none" });
+          this.showNotification(`获得: ${item.name}`, "normal");
         }
       }
     },
@@ -259,14 +262,14 @@ export const useGameStore = defineStore("game", {
         }
 
         if (msg) {
-          uni.showToast({ title: msg, icon: "none" });
+          this.showNotification(msg, "success");
         }
 
         // 移除消耗品
         this.inventory.splice(index, 1);
         this.saveGame();
       } else {
-        uni.showToast({ title: "暂时无法使用该物品", icon: "none" });
+        this.showNotification("暂时无法使用该物品", "negative");
       }
     },
 
@@ -284,7 +287,7 @@ export const useGameStore = defineStore("game", {
       }
 
       this.equipment[slot] = item;
-      uni.showToast({ title: `装备: ${item.name}`, icon: "none" });
+      this.showNotification(`装备: ${item.name}`, "success");
       this.saveGame();
     },
 
@@ -294,7 +297,7 @@ export const useGameStore = defineStore("game", {
       if (item) {
         this.equipment[slot] = null;
         this.inventory.push(item);
-        uni.showToast({ title: `卸下: ${item.name}`, icon: "none" });
+        this.showNotification(`卸下: ${item.name}`, "normal");
         this.saveGame();
       }
     },
@@ -316,7 +319,7 @@ export const useGameStore = defineStore("game", {
 
       const info = weatherData[this.weather];
       if (["storm", "snow"].includes(this.weather)) {
-        uni.showToast({ title: `警告: ${info.name}`, icon: "none" });
+        this.showNotification(`警告: ${info.name}`, "negative");
       }
     },
 
@@ -348,7 +351,7 @@ export const useGameStore = defineStore("game", {
             this.nextSceneId = "";
           } else {
             console.error("No nextSceneId to resume to!");
-            uni.showToast({ title: "路径迷失，原地徘徊...", icon: "none" });
+            this.showNotification("路径迷失，原地徘徊...", "negative");
             // Fallback: Stay in current scene or go to a safe default if needed
             // For now, doing nothing keeps player in current scene which is safe
           }
@@ -367,7 +370,7 @@ export const useGameStore = defineStore("game", {
           }
 
           this.moveToScene(eventId);
-          uni.showToast({ title: "遭遇突发事件！", icon: "none" });
+          this.showNotification("遭遇突发事件！", "negative");
         } else {
           // Normal move logic
           if (choice.target.startsWith("node_")) {
@@ -410,7 +413,7 @@ export const useGameStore = defineStore("game", {
       }
       if (this.status.hunger <= 0) {
         hpCost += 10;
-        uni.showToast({ title: "饥饿难耐，生命流失！", icon: "none" });
+        this.showNotification("饥饿难耐，生命流失！", "negative");
       }
 
       // Night Fall Risk
@@ -427,7 +430,7 @@ export const useGameStore = defineStore("game", {
 
             if (Math.random() < fallChance) {
               hpCost += 30;
-              uni.showToast({ title: "摸黑赶路摔伤了！(-30HP)", icon: "none" });
+              this.showNotification("摸黑赶路摔伤了！(-30HP)", "negative");
             }
           }
         }
@@ -462,7 +465,9 @@ export const useGameStore = defineStore("game", {
 
       this.status.sanity = Math.max(0, this.status.sanity - sanityCost);
       if (this.status.sanity <= 30) {
-        uni.showToast({ title: "意识模糊，耳边传来幻听...", icon: "none" });
+        // Debounce sanity warning? Or just specific events?
+        // Let's keep it but make it negative type
+        this.showNotification("意识模糊，耳边传来幻听...", "negative");
         if (sanityCost > 0) audioManager.playSFX("heartbeat");
       }
     },
@@ -478,7 +483,7 @@ export const useGameStore = defineStore("game", {
           // 3. 休息回血，消耗饱食度
           // Cost Hunger
           if (this.status.hunger < 20) {
-            uni.showToast({ title: "太饿了，根本睡不着！", icon: "none" });
+            this.showNotification("太饿了，根本睡不着！", "negative");
             return; // Cannot rest if starving
           }
 
@@ -495,10 +500,10 @@ export const useGameStore = defineStore("game", {
           );
 
           if (hasCursedItem) {
-            uni.showToast({
-              title: "死者的手表在背包里滴答作响...你彻夜难眠",
-              icon: "none",
-            });
+            this.showNotification(
+              "死者的手表在背包里滴答作响...你彻夜难眠",
+              "negative"
+            );
             heal = Math.floor(heal * 0.5); // Heal reduced
             this.status.sanity = Math.max(0, this.status.sanity - 10); // Sanity drops instead of efficient gain
             // Still advances day
@@ -516,10 +521,10 @@ export const useGameStore = defineStore("game", {
           this.randomizeWeather();
 
           if (!hasCursedItem) {
-            uni.showToast({
-              title: `休息一晚 (生命+${heal}, 饱食-20)`,
-              icon: "none",
-            });
+            this.showNotification(
+              `休息一晚 (生命+${heal}, 饱食-20)`,
+              "success"
+            );
           }
           this.saveGame();
           break;
@@ -528,12 +533,16 @@ export const useGameStore = defineStore("game", {
           this.gainItem("water_001");
           if (Math.random() > 0.3) this.gainItem("gear_headlamp_01");
 
+          this.gainItem("food_001");
+          this.gainItem("water_001");
+          if (Math.random() > 0.3) this.gainItem("gear_headlamp_01");
+
           this.status.sanity = Math.max(0, this.status.sanity - 10);
           audioManager.playSFX("heartbeat");
-          uni.showToast({ title: "获得物资 (理智-10)", icon: "none" });
+          this.showNotification("获得物资 (理智-10)", "success");
           break;
         case "check_gear":
-          uni.showToast({ title: "背包状态良好，暂无异常", icon: "none" });
+          this.showNotification("背包状态良好，暂无异常", "normal");
           break;
         case "sos":
           // SOS Logic
@@ -553,15 +562,12 @@ export const useGameStore = defineStore("game", {
           if (this.status.isNight) sosChance *= 0.5;
 
           if (Math.random() < sosChance) {
-            uni.showToast({
-              title: "求教信号发送成功！等待救援...",
-              icon: "success",
-            });
+            this.showNotification("求教信号发送成功！等待救援...", "success");
             setTimeout(() => {
               this.moveToScene("end_rescue");
             }, 1500);
           } else {
-            uni.showToast({ title: "无信号 / 天气恶劣无法救援", icon: "none" });
+            this.showNotification("无信号 / 天气恶劣无法救援", "negative");
             audioManager.playSFX("heartbeat"); // Panic sound
           }
           break;
@@ -570,10 +576,11 @@ export const useGameStore = defineStore("game", {
             this.status.maxSanity,
             this.status.sanity + 5
           );
-          uni.showToast({
-            title: "回望来路，内心平静了一些 (理智+5)",
-            icon: "none",
-          });
+          this.status.sanity = Math.min(
+            this.status.maxSanity,
+            this.status.sanity + 5
+          );
+          this.showNotification("回望来路，内心平静了一些 (理智+5)", "success");
           break;
         default:
           console.warn("Unknown action:", action);
@@ -695,6 +702,19 @@ export const useGameStore = defineStore("game", {
       try {
         uni.removeStorageSync("braving_aotai_save_v1");
       } catch (e) {}
+    },
+
+    // [NEW] Notification Logic
+    showNotification(this: any, message: string, type: string = "normal") {
+      // If already visible, maybe close first or overwrite?
+      // Simple implementation: Overwrite
+      this.notification = { visible: true, message, type };
+
+      // Auto close after 2s
+      if (this.notificationTimer) clearTimeout(this.notificationTimer);
+      this.notificationTimer = setTimeout(() => {
+        this.notification.visible = false;
+      }, 2500);
     },
   },
 });
