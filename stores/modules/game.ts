@@ -292,6 +292,9 @@ export const useGameStore = defineStore("game", {
             this.nextSceneId = "";
           } else {
             console.error("No nextSceneId to resume to!");
+            uni.showToast({ title: "路径迷失，原地徘徊...", icon: "none" });
+            // Fallback: Stay in current scene or go to a safe default if needed
+            // For now, doing nothing keeps player in current scene which is safe
           }
           return;
         }

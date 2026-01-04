@@ -163,13 +163,15 @@ const eventScenes: Record<string, Scene> = {
     text: "【随机事件】你发现一顶完好的帐篷搭在路边，但没有任何动静。走近时，心里涌起一股不祥的预感。",
     choices: [
       { text: "拉开帐篷查看", target: "evt_tent_result", cost: { sanity: 5 } },
-      { text: "多一事不如少一事，离开", target: "resume" },
+      { text: "多一事不如少一事，离开", target: "node_2800" },
     ],
   },
   evt_tent_result: {
     id: "evt_tent_result",
     text: "帐篷里空无一人，只有一些散落的气罐和睡袋。看来主人已经离开许久了。你捡起了一些可用的物资。",
-    choices: [{ text: "获得物资", target: "resume", action: "loot_supplies" }],
+    choices: [
+      { text: "获得物资", target: "node_2800", action: "loot_supplies" },
+    ],
   },
   evt_storm: {
     id: "evt_storm",
