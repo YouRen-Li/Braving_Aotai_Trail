@@ -116,7 +116,7 @@ const mapScenes: Record<string, Scene> = {
     bg: "loc_sunset_meadow",
     choices: [
       {
-        text: "搭帐篷过夜 (可能发现前人留下的物资)",
+        text: "搭帐篷过夜",
         action: "rest",
         target: "node_2900_morning",
       },
@@ -217,7 +217,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_nav_stand: {
     id: "node_nav_stand",
-    text: "鳌山导航架位居路径右侧。切记：直走是往23公里下山的错误死路！对着左前方那面蓝色旗子走，途径药王庙（供奉孙思邈），才是正路。",
+    text: "鳌山导航架位居路径右侧。切记：直走是往23公里下山的错误死路！对着左前方那面蓝色旗子走，途径药王庙（供奉着孙思邈），才是正路。",
     bg: "loc_nav_stand",
     choices: [
       {
@@ -268,7 +268,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_shuiwozi_source: {
     id: "node_shuiwozi_source",
-    text: "下到底就是水窝子垭口。这片大草地适合扎营但没水。直走上飞机梁，左侧下沟则是水窝子营地（最佳水源）。",
+    text: "下到底就是水窝子垭口。这片大草地适合扎营但没水。直走上飞机梁，左侧下沟则是水窝子营地。",
     bg: "loc_spring_water",
     choices: [
       {
@@ -526,7 +526,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_summit_fork: {
     id: "node_summit_fork",
-    text: "到达岔路口。左边直通大爷海（较近），右边先上拔仙台顶（最高峰）再下到大爷海。来都来了，怎能不登顶？",
+    text: "到达岔路口。左边直通大爷海，右边先上拔仙台顶再下到大爷海。来都来了，怎能不登顶？",
     bg: "loc_ridge",
     choices: [
       {
