@@ -51,6 +51,12 @@
           <text class="btn-text-secondary">继续徒步</text>
         </view>
 
+        <!-- 探险手记按钮 - 次按钮 -->
+        <view class="btn btn-secondary" @click="handleJournal">
+          <text class="btn-icon-secondary">📖</text>
+          <text class="btn-text-secondary">探险手记</text>
+        </view>
+
         <!-- 关于游戏按钮 - 文字按钮 -->
         <view class="btn btn-text-link" @click="handleAbout">
           <text class="btn-icon-link">ℹ</text>
@@ -103,14 +109,14 @@ const handleStartHike = () => {
       content: '开始新游戏将覆盖现有存档，确定吗？',
       success: (res) => {
         if (res.confirm) {
-          gameStore.initGame();
-          uni.navigateTo({ url: '/pages/game/index' });
+          gameStore.initGame(); // Optional pre-init or just let char select do it
+          uni.navigateTo({ url: '/pages/character/index' });
         }
       }
     });
   } else {
-    gameStore.initGame();
-    uni.navigateTo({ url: '/pages/game/index' });
+    // New Game -> Character Select
+    uni.navigateTo({ url: '/pages/character/index' });
   }
 };
 

@@ -3,6 +3,9 @@
     <!-- 动态背景层 -->
     <background-layer />
 
+    <!-- 昼夜遮罩层 [NEW] -->
+    <day-night-overlay :is-night="isNight" :has-vision="hasVision" />
+
     <!-- 伤害血红特效 -->
     <view class="damage-flash" :class="{ active: showDamageFlash }"></view>
 
@@ -42,6 +45,10 @@
           {{ formatCost(choice.cost) }}
         </text>
       </view>
+      <!-- Night Warning -->
+      <view v-if="isNight && !hasVision" class="night-warning">
+        <text>⚠️ 天黑路滑，视野受限 (高风险)</text>
+      </view>
     </view>
   </view>
 </template>
@@ -54,12 +61,17 @@ import BagButton from './components/BagButton.vue';
 import InventoryPanel from './components/InventoryPanel.vue';
 import GameOverPanel from './components/GameOverPanel.vue';
 import BackgroundLayer from './components/BackgroundLayer.vue';
+import DayNightOverlay from './components/DayNightOverlay.vue'; // [NEW]
 import { useTypewriter } from '@/utils/composables/useTypewriter';
 
 const gameStore = useGameStore();
 const currentScene = computed(() => gameStore.currentScene);
 const showInventory = ref(false);
 const showDamageFlash = ref(false);
+
+// Day/Night State [NEW]
+const isNight = computed(() => gameStore.status.isNight);
+const hasVision = computed(() => gameStore.hasVision);
 
 // Sanity Visuals
 const sanity = computed(() => gameStore.status.sanity);
@@ -256,6 +268,8 @@ const randomGlitchStyle = () => {
   flex-direction: column;
   gap: 24rpx;
   transition: opacity 0.3s;
+  position: relative;
+  z-index: 30; // Above overlay so we can still click
 
   &.disabled {
     opacity: 0.5;
@@ -287,5 +301,26 @@ const randomGlitchStyle = () => {
 .cost-hint {
   font-size: 24rpx;
   color: #ff6b6b; // Reddish for costs
+}
+
+.night-warning {
+  text-align: center;
+  color: #ffcc00;
+  font-size: 24rpx;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.7;
+  }
 }
 </style>

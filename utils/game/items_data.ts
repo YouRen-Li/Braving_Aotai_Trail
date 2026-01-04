@@ -84,4 +84,13 @@ export const items: Record<string, Item> = {
     icon: "🦯",
     stats: { speed: 5 },
   },
+  gear_headlamp_01: {
+    id: "gear_headlamp_01",
+    name: "手电筒",
+    description: "夜间行进的生命之光。没有它，夜晚就是地狱。",
+    type: "gear",
+    slot: "head",
+    icon: "🔦",
+    stats: { warmth: 0 },
+  },
 };
