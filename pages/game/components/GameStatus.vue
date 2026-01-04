@@ -1,8 +1,14 @@
 <template>
   <view class="status-bar">
-    <!-- 天数显示 -->
-    <view class="day-indicator">
-      <text class="day-text">DAY {{ days }}</text>
+    <!-- 左侧：天数与天气 -->
+    <view class="info-group">
+      <view class="day-indicator">
+        <text class="day-text">DAY {{ days }}</text>
+      </view>
+      <view class="weather-indicator" v-if="weatherInfo">
+        <text class="weather-icon">{{ weatherInfo.icon }}</text>
+        <text class="weather-name">{{ weatherInfo.name }}</text>
+      </view>
     </view>
 
     <!-- 状态条区域 -->
@@ -37,6 +43,7 @@ const gameStore = useGameStore();
 const hp = computed(() => gameStore.status.hp);
 const hunger = computed(() => gameStore.status.hunger);
 const days = computed(() => gameStore.player.days);
+const weatherInfo = computed(() => gameStore.currentWeatherInfo);
 </script>
 
 <style lang="scss" scoped>
@@ -49,21 +56,41 @@ const days = computed(() => gameStore.player.days);
   backdrop-filter: blur(10px);
   border-bottom: 1rpx solid rgba(255, 255, 255, 0.1);
   position: fixed;
-  top: 0; // 这里的top需要适配不同机型的刘海屏，后续优化
+  top: 0;
   left: 0;
   width: 100%;
   z-index: 100;
   box-sizing: border-box;
 }
 
+.info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
 .day-indicator {
-  
   .day-text {
     font-size: 32rpx;
     font-weight: 800;
     color: #fff;
     font-family: monospace;
     letter-spacing: 2rpx;
+  }
+}
+
+.weather-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+
+  .weather-icon {
+    font-size: 24rpx;
+  }
+
+  .weather-name {
+    font-size: 20rpx;
+    color: rgba(255, 255, 255, 0.8);
   }
 }
 
@@ -79,7 +106,7 @@ const days = computed(() => gameStore.player.days);
   display: flex;
   align-items: center;
   gap: 12rpx;
-  
+
   .icon {
     font-size: 24rpx;
     color: #ccc;
@@ -89,7 +116,7 @@ const days = computed(() => gameStore.player.days);
 
   .value {
     font-size: 20rpx;
-    color: rgba(255,255,255,0.7);
+    color: rgba(255, 255, 255, 0.7);
     width: 40rpx;
     text-align: right;
   }
