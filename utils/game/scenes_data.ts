@@ -152,7 +152,11 @@ const mapScenes: Record<string, Scene> = {
     text: "鳌太山脊在这里拐了个大弯。这里有信号，可以给家人报个平安。下方深沟里似乎隐约有水源的反光。",
     bg: "loc_penjing",
     choices: [
-      { text: "给家人打电话", action: "rest", target: "node_baiqi_start" },
+      {
+        text: "给家人打电话 (理智+20)",
+        target: "node_baiqi_start",
+        cost: { sanity: -20 },
+      },
       {
         text: "下沟取水 (耗时，获得物资)",
         target: "node_penjing_gully", // Detour
@@ -224,7 +228,7 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "迷信直觉，直走",
         target: "end_lost_23km", // New dead end? Or just punishment
-        cost: { hunger: 20, sanity: -20 },
+        cost: { hunger: 20, sanity: 20 },
       },
     ],
   },
@@ -334,7 +338,7 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "腿软，在同伴/意念帮助下通过",
         target: "node_liang2",
-        cost: { hunger: 10, sanity: -10 },
+        cost: { hunger: 10, sanity: 10 },
       },
     ],
   },
@@ -474,7 +478,7 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "无水，只能强行翻越九重石海",
         target: "node_stone_sea_9",
-        cost: { hunger: 20, sanity: -10 },
+        cost: { hunger: 20, sanity: 10 },
       },
     ],
   },
@@ -560,12 +564,12 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "寻找树上的红布条",
         target: "node_pyramid_ascent",
-        cost: { hunger: 20, sanity: 5 },
+        cost: { hunger: 20, sanity: -10 }, // Relief
       },
       {
         text: "冷静下来，观察兽道",
         target: "node_pyramid_ascent",
-        cost: { hunger: 15, sanity: -5 },
+        cost: { hunger: 15, sanity: 5 }, // Stress
       },
     ],
   },
@@ -598,7 +602,11 @@ const mapScenes: Record<string, Scene> = {
     text: "群峰环绕的高山明珠——大爷海。这里有接待站，饭菜虽贵但能救急。喝一瓶20元的可乐，是鳌太穿越最具象征意义的仪式。",
     bg: "loc_daye_lake",
     choices: [
-      { text: "购买食物和可乐 (20元)", action: "rest", target: "node_wengong" }, // Abstract money as 'rest'
+      {
+        text: "购买食物和可乐 (20元，饱食+30，理智+20)",
+        target: "node_wengong",
+        cost: { hunger: -30, sanity: -20 },
+      },
       { text: "不消费，继续赶路", target: "node_wengong", cost: { hunger: 5 } },
     ],
   },
@@ -861,12 +869,12 @@ const eventScenes: Record<string, Scene> = {
     choices: [
       {
         text: "停下来仔细听",
-        cost: { sanity: -10, hunger: 5 },
+        cost: { sanity: 10, hunger: 5 },
         target: "resume",
       },
       {
         text: "掐自己一下，清醒过来",
-        cost: { sanity: 5, hp: 2 },
+        cost: { sanity: -5, hp: 2 },
         target: "resume",
       },
     ],
@@ -878,7 +886,7 @@ const eventScenes: Record<string, Scene> = {
     choices: [
       {
         text: "用求生绳绑住",
-        action: "rest", // Simulating time cost
+        cost: { hunger: 10 }, // Cost hunger/time instead of rest
         target: "resume",
       },
       {
@@ -916,7 +924,7 @@ const eventScenes: Record<string, Scene> = {
       },
       {
         text: "惊慌失措地狂奔",
-        cost: { hp: 50, sanity: -10 },
+        cost: { hp: 50, sanity: 10 },
         target: "resume",
       },
     ],
@@ -932,7 +940,7 @@ const eventScenes: Record<string, Scene> = {
       },
       {
         text: "屏住呼吸，悄悄通过",
-        cost: { sanity: -5 },
+        cost: { sanity: 5 },
         target: "resume",
       },
     ],
