@@ -97,7 +97,11 @@ const mapScenes: Record<string, Scene> = {
     bg: "loc_forest",
     choices: [
       { text: "咬牙坚持", target: "node_2900", cost: { hunger: 15, hp: 5 } },
-      { text: "喝口水休息一下", action: "rest", target: "node_2900" },
+      {
+        text: "喝口水继续赶路",
+        cost: { hp: -5, hunger: 5 },
+        target: "node_2900",
+      },
     ],
   },
 
@@ -106,7 +110,7 @@ const mapScenes: Record<string, Scene> = {
     text: "【2900营地】终于，你到达了第一晚的落脚点。这里地势相对平坦，是一片开阔的草甸。夕阳下的秦岭美得令人窒息。",
     bg: "loc_sunset_meadow",
     choices: [
-      { text: "搭帐篷过夜", action: "rest" },
+      { text: "搭帐篷过夜", action: "rest", target: "node_2900_morning" },
       {
         text: "趁天色还早赶往盆景园",
         target: "node_penjing_ascent",
@@ -114,6 +118,13 @@ const mapScenes: Record<string, Scene> = {
       },
       { text: "感觉状态不对，下撤", target: "end_retreat" },
     ],
+  },
+
+  node_2900_morning: {
+    id: "node_2900_morning",
+    text: "【2900营地·清晨】清晨的阳光洒在帐篷上。昨晚虽然寒冷，但你终于恢复了一些体力。是时候出发了。",
+    bg: "loc_sunset_meadow",
+    choices: [{ text: "拔营前往盆景园", target: "node_penjing_ascent" }],
   },
 
   // === 第二章：脊线之上 (On the Ridge) ===
@@ -192,7 +203,11 @@ const mapScenes: Record<string, Scene> = {
         target: "node_maijie_descent",
         cost: { hunger: 10, hp: 2 },
       },
-      { text: "躲在架子下躲避一会", action: "rest" },
+      {
+        text: "在架子下躲避风雪 (恢复体力)",
+        cost: { hp: -10, hunger: 10, sanity: -5 },
+        target: "node_maijie_descent",
+      },
     ],
   },
 
@@ -253,7 +268,7 @@ const mapScenes: Record<string, Scene> = {
     text: "【水窝子营地】这里是一个相对避风的鞍部。许多队伍会选择在这里扎营。地上有些前人留下的气罐垃圾。",
     bg: "loc_camp",
     choices: [
-      { text: "扎营休整", action: "rest" },
+      { text: "扎营休整", action: "rest", target: "node_shuiwozi_morning" },
       {
         text: "状态还行，继续",
         target: "node_plane_wreck",
@@ -261,6 +276,13 @@ const mapScenes: Record<string, Scene> = {
       },
       { text: "太难了，我要下撤", target: "end_retreat" },
     ],
+  },
+
+  node_shuiwozi_morning: {
+    id: "node_shuiwozi_morning",
+    text: "【水窝子·清晨】这片鞍部在早晨显得格外宁静。远处的云海在翻腾。你收拾好垃圾，准备迎接最艰难的路段。",
+    bg: "loc_camp",
+    choices: [{ text: "出发，穿越飞机梁", target: "node_plane_wreck" }],
   },
 
   // === 第四章：迷途 (Lost) ===

@@ -41,9 +41,7 @@
       <view v-for="(choice, index) in currentScene.choices" :key="index" class="choice-btn" hover-class="btn-hover"
         @click="onChoose(choice)">
         <text class="btn-text">{{ choice.text }}</text>
-        <text v-if="choice.cost" class="cost-hint">
-          {{ formatCost(choice.cost) }}
-        </text>
+        <!-- Removed Cost Hint for Realism -->
       </view>
       <!-- Night Warning -->
       <view v-if="isNight && !hasVision" class="night-warning">

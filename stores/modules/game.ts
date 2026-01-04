@@ -388,7 +388,15 @@ export const useGameStore = defineStore("game", {
           this.initGame(this.player.roleId);
           break;
         case "rest":
-          // 休息回血，翻转回白天
+          // 3. 休息回血，消耗饱食度
+          // Cost Hunger
+          if (this.status.hunger < 20) {
+            uni.showToast({ title: "太饿了，根本睡不着！", icon: "none" });
+            return; // Cannot rest if starving
+          }
+
+          this.status.hunger = Math.max(0, this.status.hunger - 25);
+
           let heal = 30;
           if (this.weather === "storm") heal = 10;
           if (this.weather === "sunny") heal = 50;
@@ -401,8 +409,9 @@ export const useGameStore = defineStore("game", {
           this.status.isNight = false;
           this.player.days += 1;
           this.randomizeWeather();
+
           uni.showToast({
-            title: `休息一晚 (生命+${heal}, 理智+20)`,
+            title: `休息一晚 (生命+${heal}, 饱食-25)`,
             icon: "none",
           });
           this.saveGame();
