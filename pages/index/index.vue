@@ -20,6 +20,11 @@
 
     <!-- 主要内容区域 -->
     <view class="content">
+      <!-- 音乐控制按钮 [NEW] -->
+      <view class="music-btn" @click="toggleMusic" hover-class="btn-hover">
+        <text class="icon">{{ isMusicOn ? '🔊' : '🔇' }}</text>
+      </view>
+
       <!-- 标题区域 -->
       <view class="title-section">
         <!-- 主标题 -->
@@ -86,10 +91,17 @@
 import { ref, onMounted } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { useGameStore } from '@/stores/modules/game';
+import { audioManager } from '@/utils/game/audio_manager'; // [NEW]
 
 const gameStore = useGameStore();
 const hasSave = ref(false);
 const snowflakes = ref([]);
+
+// --- Music Control ---
+const isMusicOn = ref(audioManager.isMusicOn);
+const toggleMusic = () => {
+  isMusicOn.value = audioManager.toggleMusic();
+};
 
 onMounted(() => {
   // 生成少量的雪花，营造淡淡的氛围
@@ -149,6 +161,34 @@ const confirmReset = () => {
 </script>
 
 <style lang="scss" scoped>
+/* Music Button */
+.music-btn {
+  position: absolute;
+  top: 40rpx;
+  right: 40rpx;
+  width: 70rpx;
+  height: 70rpx;
+  background: rgba(255, 255, 255, 0.15); // Lighter for splash screen
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+
+  .icon {
+    font-size: 28rpx;
+    opacity: 0.9;
+  }
+
+  &:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
 .container {
   position: relative;
   width: 100%;

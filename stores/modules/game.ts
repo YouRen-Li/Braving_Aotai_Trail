@@ -186,6 +186,9 @@ export const useGameStore = defineStore("game", {
 
       this.notification = { visible: false, message: "", type: "normal" }; // [NEW] Notification State
 
+      // Start BGM
+      audioManager.playBGM("wind");
+
       // Items from Role
       role.items.forEach((itemId: string) => this.gainItem(itemId));
 
@@ -317,9 +320,11 @@ export const useGameStore = defineStore("game", {
         audioManager.playBGM("sunny");
       }
 
-      const info = weatherData[this.weather];
       if (["storm", "snow"].includes(this.weather)) {
         this.showNotification(`警告: ${info.name}`, "negative");
+        audioManager.playBGM("wind");
+      } else {
+        audioManager.playBGM("sunny");
       }
     },
 

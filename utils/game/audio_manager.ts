@@ -19,16 +19,27 @@ class AudioManager {
     });
   }
 
-  playBGM(type: "wind" | "sunny" | "calm") {
+  public isMusicOn: boolean = true;
+
+  playBGM(type: "wind" | "sunny" | "calm" | "snow" | "storm") {
+    // If music is globally off, just record what SHOULD be playing but don't play it
+    if (!this.isMusicOn) {
+      this.currentBgm = type;
+      return;
+    }
+
     if (this.currentBgm === type) return;
 
     let src = "";
     switch (type) {
       case "wind":
-        src = "/static/audio/bgm_wind.mp3";
+      case "snow":
+      case "storm":
+        src = "/static/audio/Winter.wav";
         break;
       case "sunny":
-        src = "/static/audio/bgm_sunny.mp3";
+      case "calm":
+        src = "/static/audio/Ambient.wav";
         break;
       default:
         src = "";
@@ -42,6 +53,22 @@ class AudioManager {
       this.bgmContext.stop();
       this.currentBgm = null;
     }
+  }
+
+  toggleMusic() {
+    this.isMusicOn = !this.isMusicOn;
+    if (this.isMusicOn) {
+      // Resume logic: if we have a current BGM type (or default to one), play it
+      if (this.currentBgm) {
+        // Force replay smoothly
+        const type = this.currentBgm as any;
+        this.currentBgm = null; // Reset to force playBGM to act
+        this.playBGM(type);
+      }
+    } else {
+      this.bgmContext.pause();
+    }
+    return this.isMusicOn;
   }
 
   playSFX(type: "heartbeat" | "scream" | "step") {

@@ -66,9 +66,10 @@ import BackgroundLayer from './components/BackgroundLayer.vue';
 import DayNightOverlay from './components/DayNightOverlay.vue';
 import GameNotification from './components/GameNotification.vue'; // [NEW]
 import { useTypewriter } from '@/utils/composables/useTypewriter';
-import { getCorruptedText } from '@/utils/game/sanity_utils'; // [NEW]
+import { getCorruptedText } from '@/utils/game/sanity_utils';
 
 const gameStore = useGameStore();
+
 const currentScene = computed(() => gameStore.currentScene);
 // [NEW] Filter choices by role
 const filteredChoices = computed(() => {
@@ -213,6 +214,7 @@ page {
 </style>
 
 <style lang="scss" scoped>
+/* 容器定义 */
 .game-container {
   width: 100%;
   height: 100vh;
