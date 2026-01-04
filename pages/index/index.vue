@@ -244,17 +244,19 @@ const handleAbout = () => {
 }
 
 .main-title {
-  font-size: 146rpx;
+  font-size: 96rpx;
   font-weight: 800;
   color: #ffffff;
-  letter-spacing: 32rpx;
+  letter-spacing: 12rpx;
   text-shadow:
     0 4rpx 10rpx rgba(0, 0, 0, 0.3),
     0 10rpx 40rpx rgba(0, 0, 0, 0.5);
   margin-bottom: 40rpx;
   background: linear-gradient(180deg, #ffffff 30%, #e0e6ed 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  white-space: nowrap;
 }
 
 .subtitle-wrap {

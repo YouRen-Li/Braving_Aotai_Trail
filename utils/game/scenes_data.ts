@@ -458,7 +458,7 @@ const mapScenes: Record<string, Scene> = {
   node_stone_sea_9: {
     id: "node_stone_sea_9",
     text: "【九重石海】鳌太必经之路。三面石海连着太白梁，状如迎风破浪的巨舰。只能从“船头”正面硬爬。石头稳固，但极为漫长。",
-    bg: "loc_stone_sea",
+    bg: "loc_stone_sea_giant_ship",
     choices: [
       {
         text: "一步步爬上“船头”",
@@ -740,7 +740,7 @@ const eventScenes: Record<string, Scene> = {
   evt_hiker: {
     id: "evt_hiker",
     text: "浓雾中，你隐约听到前方有呼救声。走近一看，是一个眼神涣散的落单驴友。他说同伴走丢了，自己也没水了。",
-    bg: "bg_fog",
+    bg: "evt_rescue_hiker",
     choices: [
       {
         text: "分他半瓶水",
@@ -758,7 +758,7 @@ const eventScenes: Record<string, Scene> = {
   evt_tent: {
     id: "evt_tent",
     text: "你发现一顶完好的帐篷搭在路边，但没有任何动静。走近时，心里涌起一股不祥的预感。",
-    bg: "loc_camp",
+    bg: "evt_abandoned_tent",
     choices: [
       { text: "拉开帐篷查看", target: "evt_tent_result", cost: { sanity: 5 } },
       { text: "多一事不如少一事，离开", target: "resume" },
@@ -798,7 +798,7 @@ const eventScenes: Record<string, Scene> = {
   evt_ranger: {
     id: "evt_ranger",
     text: "前方路口出现了几个穿迷彩服的身影——是自然保护区的巡山队！鳌太线全线封禁，你这是在非法穿越。",
-    bg: "loc_forest",
+    bg: "evt_ranger_patrol",
     choices: [
       { text: "配合执法，接受处罚", target: "end_caught" },
       {
@@ -811,7 +811,7 @@ const eventScenes: Record<string, Scene> = {
   evt_body: {
     id: "evt_body",
     text: "在一块巨石的缝隙中，你发现了一具蜷缩的遗体。他衣着单薄，似乎生前有“反常脱衣”现象。这残酷的一幕让你不寒而栗。",
-    bg: "loc_stone_sea",
+    bg: "evt_frozen_body",
     choices: [
       { text: "搜寻遗物", action: "loot_supplies", target: "resume" },
       { text: "默哀并离开", cost: { hunger: 5, sanity: 10 }, target: "resume" },
@@ -820,7 +820,7 @@ const eventScenes: Record<string, Scene> = {
   evt_takin: {
     id: "evt_takin",
     text: "一头体型硕大的秦岭羚牛挡在了由独木桥上。它盯着你，鼻孔喷着白气。这种独行公牛极具攻击性。",
-    bg: "loc_forest",
+    bg: "evt_takin_beast",
     choices: [
       {
         text: "原地不动等待",
