@@ -448,6 +448,10 @@ export const useGameStore = defineStore("game", {
 
           this.status.hunger = Math.max(0, this.status.hunger - 25);
 
+          let heal = 30;
+          if (this.weather === "storm") heal = 10;
+          if (this.weather === "sunny") heal = 50;
+
           // [MORAL DILEMMA] Cursed Items check
           // If player has 'relic_watch' (Dead man's watch), resting is less effective/painful
           const hasCursedItem = this.inventory.some(
