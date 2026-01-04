@@ -358,7 +358,7 @@ const mapScenes: Record<string, Scene> = {
       },
       {
         text: "连夜赶路 (极度危险)",
-        target: "node_pyramid_ascent",
+        target: "node_fog_entry",
         cost: { sanity: -50 },
       },
     ],
@@ -725,6 +725,12 @@ const mapScenes: Record<string, Scene> = {
     id: "end_rescue",
     text: "【获救】只有亲历者才知道等待救援的那十几个小时有多绝望。获救了，但“驴友”的名声又多了一笔负面教材。",
     bg: "loc_camp",
+    choices: [{ text: "重新开始", action: "restart" }],
+  },
+  end_lost_23km: {
+    id: "end_lost_23km",
+    text: "【失踪】你虽然走了直路，却越走越偏。这是著名的“23公里跑道”，一条通往死亡的单行道。没人知道你去了哪里。",
+    bg: "bg_fog",
     choices: [{ text: "重新开始", action: "restart" }],
   },
 };
