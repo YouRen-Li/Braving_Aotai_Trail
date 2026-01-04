@@ -687,6 +687,11 @@ export const useGameStore = defineStore("game", {
           this.weather = saved.weather || "sunny";
           this.history = saved.history || [];
 
+          // [FIX] Ensure notification object exists for old saves
+          if (!this.notification) {
+            this.notification = { visible: false, message: "", type: "normal" };
+          }
+
           if (this.gameState === "playing") {
             audioManager.playBGM(
               ["storm", "snow"].includes(this.weather) ? "wind" : "sunny"

@@ -113,6 +113,11 @@ export const mapScenes: Record<string, Scene> = {
   node_river_jump_feedback: {
     id: "node_river_jump_feedback",
     text: "你深吸一口气，在湿滑的乱石间腾挪。脚底打滑的瞬间，心脏猛地一缩，好在核心力量稳住了平衡。虽然没湿鞋，但精神高度紧张。\n(状态反馈：饱食度 -3，理智 -2)",
+    weatherText: {
+      storm:
+        "狂风呼啸，让你几乎站立不稳。你在满是冰棱的乱石间艰难跳跃，好几次差点被风吹进冰河里。这是一次赌博。\n(状态反馈：饱食度 -3，理智 -5)",
+      snow: "雪花迷住了眼睛，石头变得极度湿滑。你凭着本能跃过河面，落地时脚踝一阵剧痛，好在没有扭伤。\n(状态反馈：饱食度 -3，理智 -2)",
+    },
     bg: "loc_river",
     choices: [
       {

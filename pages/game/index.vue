@@ -182,10 +182,7 @@ const handleTextClick = () => {
 const isProcessing = ref(false);
 
 const onChoose = (choice) => {
-  if (isTyping.value) {
-    skip(); // Click during typing -> Skip text
-    return;
-  }
+
 
   if (isProcessing.value) return; // Debounce
   isProcessing.value = true;
