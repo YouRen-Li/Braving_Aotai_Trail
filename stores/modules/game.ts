@@ -428,6 +428,36 @@ export const useGameStore = defineStore("game", {
         case "check_gear":
           uni.showToast({ title: "背包状态良好，暂无异常", icon: "none" });
           break;
+        case "sos":
+          // SOS Logic
+          // 1. Cost Sanity
+          this.status.sanity = Math.max(0, this.status.sanity - 15);
+
+          // 2. Calculate Success Rate
+          let sosChance = 0.3; // Base chance 30%
+          if (
+            this.currentSceneId.includes("village") ||
+            this.currentSceneId.includes("road")
+          )
+            sosChance = 0.9;
+          if (this.weather === "storm") sosChance = 0.0;
+          if (this.weather === "fog") sosChance = 0.1;
+          if (this.weather === "snow") sosChance = 0.2;
+          if (this.status.isNight) sosChance *= 0.5;
+
+          if (Math.random() < sosChance) {
+            uni.showToast({
+              title: "求教信号发送成功！等待救援...",
+              icon: "success",
+            });
+            setTimeout(() => {
+              this.moveToScene("end_rescue");
+            }, 1500);
+          } else {
+            uni.showToast({ title: "无信号 / 天气恶劣无法救援", icon: "none" });
+            audioManager.playSFX("heartbeat"); // Panic sound
+          }
+          break;
         case "look_back":
           this.status.sanity = Math.min(
             this.status.maxSanity,

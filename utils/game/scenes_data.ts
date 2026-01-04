@@ -116,7 +116,7 @@ const mapScenes: Record<string, Scene> = {
         target: "node_penjing_ascent",
         cost: { hunger: 15, sanity: 5 },
       },
-      { text: "感觉状态不对，下撤", target: "end_retreat" },
+      { text: "感觉状态不对，决定下撤", target: "end_retreat" },
     ],
   },
 
@@ -274,7 +274,7 @@ const mapScenes: Record<string, Scene> = {
         target: "node_plane_wreck",
         cost: { hunger: 10 },
       },
-      { text: "太难了，我要下撤", target: "end_retreat" },
+      { text: "感到极限，决定下撤", target: "end_retreat" },
     ],
   },
 
@@ -433,47 +433,47 @@ const mapScenes: Record<string, Scene> = {
     id: "end_success",
     text: "顺着游人如织的台阶路下山，你恍如隔世。你满身泥泞，在游客惊讶的目光中走出了大山。你活着，并且战胜了自己。",
     bg: "bg_sunny",
-    choices: [{ text: "再来一次", action: "restart" }],
+    choices: [{ text: "铭记此次经历，重新开始", action: "restart" }],
   },
   end_retreat: {
     id: "end_retreat",
-    text: "【结局：明智撤退】山永远在那里，生命只有一次。你选择了下撤。虽然通过了，但安全回家才是户外的终点。",
-    bg: "loc_village", // Updated
-    choices: [{ text: "重新开始", action: "restart" }],
+    text: "【明智之选】山永远在那里，生命只有一次。你做出了艰难但正确的决定——下撤。回望云雾缭绕的主峰，你知道自己还会回来的。",
+    bg: "loc_village",
+    choices: [{ text: "结束本次旅程", action: "restart" }],
   },
   dead_001: {
     id: "dead_001",
-    text: "【结局：长眠大山】你的意识逐渐模糊... 身体不再寒冷，反而感到一丝温暖。在这片无人区，你成为了大山的一部分。",
+    text: "【长眠大山】你的意识逐渐模糊... 身体不再寒冷，反而感到一丝温暖。在这片无人区，你成为了大山的一部分。",
     bg: "bg_snow",
     choices: [{ text: "重新开始", action: "restart" }],
   },
   dead_starve: {
     id: "dead_starve",
-    text: "【结局：饥寒交迫】食物耗尽，体力透支。你倒在了路上，再也没有力气站起来。",
+    text: "【力竭】食物耗尽，体力透支。你倒在了路上，再也没有力气站起来。",
     bg: "bg_snow",
     choices: [{ text: "重新开始", action: "restart" }],
   },
   dead_cold: {
     id: "dead_cold",
-    text: "【结局：失温】核心体温降低，你开始出现幻觉，感到异常燥热而脱去了衣服... 最后的微笑凝固在嘴角。",
+    text: "【失温】核心体温降低，你开始出现幻觉，感到异常燥热而脱去了衣服... 最后的微笑凝固在嘴角。",
     bg: "bg_storm",
     choices: [{ text: "重新开始", action: "restart" }],
   },
   dead_sanity: {
     id: "dead_sanity",
-    text: "【结局：精神崩溃】无尽的黑暗和风声击垮了你的意志。你开始胡言乱语，冲向了悬崖...",
+    text: "【崩溃】无尽的黑暗和风声击垮了你的意志。你开始胡言乱语，冲向了悬崖...",
     bg: "bg_fog",
     choices: [{ text: "重新开始", action: "restart" }],
   },
   end_caught: {
     id: "end_caught",
-    text: "【结局：被捕】你被巡山队带回了派出所。写下保证书，缴纳罚款，并被列入黑名单。这一趟“非法穿越”终究以闹剧收场。",
+    text: "【被捕】你被巡山队带回了派出所。写下保证书，缴纳罚款，并被列入黑名单。这一趟“非法穿越”终究以闹剧收场。",
     bg: "loc_village", // Updated
     choices: [{ text: "接受教训，重新开始", action: "restart" }],
   },
   end_rescue: {
     id: "end_rescue",
-    text: "【结局：获救】只有亲历者才知道等待救援的那十几个小时有多绝望。获救了，但“驴友”的名声又多了一笔负面教材。",
+    text: "【获救】只有亲历者才知道等待救援的那十几个小时有多绝望。获救了，但“驴友”的名声又多了一笔负面教材。",
     bg: "loc_camp",
     choices: [{ text: "重新开始", action: "restart" }],
   },
@@ -493,7 +493,7 @@ const eventScenes: Record<string, Scene> = {
       }, // +Karma
       { text: "自身难保，离开", cost: { sanity: 10 }, target: "resume" }, // Guilt
       {
-        text: "帮他报警",
+        text: "尝试帮他求救",
         cost: { hp: 20, hunger: 20, sanity: -5 },
         target: "resume",
       },
@@ -529,8 +529,15 @@ const eventScenes: Record<string, Scene> = {
         cost: { hunger: 40, sanity: 5 },
         target: "resume",
       },
-      { text: "绝望报警(救援结局)", target: "end_rescue" },
+      { text: "尝试用卫星电话求救 (需要信号)", action: "sos" },
     ],
+  },
+
+  node_sos_fail: {
+    id: "node_sos_fail",
+    text: "【求救失败】电话那头只有嘈杂的电流声。在这种恶劣天气和地形下，信号很难接通。即使接通，直升机也无法在风雪中起飞。",
+    bg: "bg_storm",
+    choices: [{ text: "收起电话，另寻出路", target: "resume" }],
   },
   evt_ranger: {
     id: "evt_ranger",
