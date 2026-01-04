@@ -27,13 +27,25 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useGameStore } from '@/stores/modules/game';
 
 const gameStore = useGameStore();
 
-const visible = computed(() => gameStore.gameState === 'ended');
+const visible = ref(false);
 const days = computed(() => gameStore.player.days);
+
+// Watch game state to trigger modal with delay
+watch(() => gameStore.gameState, (newVal) => {
+    if (newVal === 'ended') {
+        // Give user 2 seconds to read the death text before showing modal
+        setTimeout(() => {
+            visible.value = true;
+        }, 2000);
+    } else {
+        visible.value = false;
+    }
+}, { immediate: true });
 
 // Extract death reason from history or just show a generic message if missing
 const deathReason = computed(() => {
