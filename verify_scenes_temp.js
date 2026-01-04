@@ -1,29 +1,11 @@
-export interface ChoiceCost {
-  hp?: number;
-  hunger?: number;
-  sanity?: number;
-}
 
-export interface SceneChoice {
-  text: string;
-  target?: string; // Target scene ID. 'resume' for random events.
-  cost?: ChoiceCost;
-  action?: string; // Special actions: 'restart', 'rest', 'loot_supplies', 'refill_water', 'look_back'
-  requiredRole?: string; // Only visible if player has this role
-  condition?: string; // [NEW] e.g., 'shuiwozi_water' (must be true in worldFlags) or '!liang2_blocked'
-}
 
-export interface Scene {
-  id: string;
-  text: string;
-  choices: SceneChoice[];
-  bg?: string;
-  type?: "normal" | "loot" | "event";
-  weatherText?: Record<string, string>; // [NEW] Key: WeatherType (sunny, storm, etc.)
-}
+
+
+
 
 // --- 真实地图节点扩充版 ---
-const mapScenes: Record<string, Scene> = {
+const mapScenes = {
   // === 第一章：进山 ===
 
   start_001: {
@@ -832,7 +814,7 @@ const mapScenes: Record<string, Scene> = {
 };
 
 // --- 随机事件 ---
-const eventScenes: Record<string, Scene> = {
+const eventScenes = {
   evt_hiker: {
     id: "evt_hiker",
     text: "浓雾中，你隐约听到前方有呼救声。走近一看，是一个眼神涣散的落单驴友。他说同伴走丢了，自己也没水了。",
@@ -1017,12 +999,12 @@ const eventScenes: Record<string, Scene> = {
   },
 };
 
-export const scenes: Record<string, Scene> = {
+const scenes = {
   ...mapScenes,
   ...eventScenes,
 };
 
-export const randomEventIds = [
+const randomEventIds = [
   "evt_hiker",
   "evt_storm",
   "evt_ranger",
@@ -1034,3 +1016,58 @@ export const randomEventIds = [
   "evt_lightning",
   "evt_wild_boar",
 ];
+
+console.log("Starting Validation...");
+let errorCount = 0;
+
+const allSceneIds = new Set(Object.keys(scenes));
+
+// Check randomEventIds
+randomEventIds.forEach(id => {
+    if (!scenes[id]) {
+        console.error("Error: Random event ID not found: " + id);
+        errorCount++;
+    }
+});
+
+// Check choices
+Object.values(scenes).forEach(scene => {
+    if (!scene.choices) {
+        // Some endings might not have choices? No, usually they have restart.
+        // But end_game_cleared we suspected.
+        console.warn("Warning: Scene has no choices: " + scene.id);
+        if (!scene.id.startsWith('end_') && !scene.id.startsWith('dead_')) {
+             console.error("Error: Non-ending scene has no choices: " + scene.id);
+             errorCount++;
+        }
+        return;
+    }
+
+    scene.choices.forEach((choice, index) => {
+        // Must have target OR action
+        if (!choice.target && !choice.action) {
+            console.error(`Error: Scene '${scene.id}' choice ${index} ('${choice.text}') has no target and no action.`);
+            errorCount++;
+        }
+
+        if (choice.target) {
+            if (choice.target === 'resume') {
+                // Valid for events
+            } else if (choice.target.startsWith('node_') || choice.target.startsWith('evt_') || choice.target.startsWith('end_') || choice.target.startsWith('dead_') || choice.target === 'start_001') {
+                 if (!scenes[choice.target]) {
+                     console.error(`Error: Scene '${scene.id}' choice ${index} targets missing scene: '${choice.target}'`);
+                     errorCount++;
+                 }
+            } else {
+                 // Unknown format
+                 console.warn(`Warning: Scene '${scene.id}' choice ${index} has unusual target: '${choice.target}'`);
+                 if (!scenes[choice.target]) {
+                     console.error(`Error: Target not found: ${choice.target}`);
+                     errorCount++;
+                 }
+            }
+        }
+    });
+});
+
+console.log(`Validation complete. Found ${errorCount} errors.`);
