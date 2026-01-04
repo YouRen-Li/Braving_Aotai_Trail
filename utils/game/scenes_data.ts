@@ -24,7 +24,7 @@ const mapScenes: Record<string, Scene> = {
 
   start_001: {
     id: "start_001",
-    text: "这里是塘口，鳌太线的起点。清晨的空气冷冽刺骨。眼前是连绵的秦岭山脉，墨绿色的冷杉林在风中低语。这一去，便是数日的无人区。",
+    text: "这里是塘口村，鳌太线的起点。清晨的空气冷冽刺骨。眼前是连绵的秦岭山脉，墨绿色的冷杉林在风中低语。这一去，便是数日的无人区。",
     bg: "loc_village",
     choices: [
       { text: "整理心情，踏上机耕路", target: "node_village_road" },
@@ -469,7 +469,7 @@ const mapScenes: Record<string, Scene> = {
     id: "end_caught",
     text: "【被捕】你被巡山队带回了派出所。写下保证书，缴纳罚款，并被列入黑名单。这一趟“非法穿越”终究以闹剧收场。",
     bg: "loc_village", // Updated
-    choices: [{ text: "接受教训，重新开始", action: "restart" }],
+    choices: [{ text: "徒步结束", action: "restart" }],
   },
   end_rescue: {
     id: "end_rescue",
