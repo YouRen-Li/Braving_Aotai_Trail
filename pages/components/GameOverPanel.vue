@@ -28,8 +28,8 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
-import { useGameStore } from '@/stores/modules/game';
-import { scenes } from '@/utils/game/scenes_data'; // Import scenes to look up titles/text if needed, but we used IDs
+import { useGameStore } from '@/stores/game';
+import { scenes } from '@/utils/scenes_data'; // Import scenes to look up titles/text if needed, but we used IDs
 
 const gameStore = useGameStore();
 

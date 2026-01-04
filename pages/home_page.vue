@@ -90,8 +90,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
-import { useGameStore } from '@/stores/modules/game';
-import { audioManager } from '@/utils/game/utils/audio_manager';
+import { useGameStore } from '@/stores/game';
+import { audioManager } from '@/utils/utils/audio_manager';
 
 const gameStore = useGameStore();
 const hasSave = ref(false);

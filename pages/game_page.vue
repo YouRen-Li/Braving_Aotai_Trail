@@ -57,7 +57,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { useGameStore } from '@/stores/modules/game';
+import { useGameStore } from '@/stores/game';
 import GameStatus from '@/pages/components/GameStatus.vue';
 import BagButton from '@/pages/components/BagButton.vue';
 import InventoryPanel from '@/pages/components/InventoryPanel.vue';
@@ -66,7 +66,7 @@ import BackgroundLayer from '@/pages/components/BackgroundLayer.vue';
 import DayNightOverlay from '@/pages/components/DayNightOverlay.vue';
 import GameNotification from '@/pages/components/GameNotification.vue';
 import { useTypewriter } from '@/utils/composables/useTypewriter';
-import { getCorruptedText } from '@/utils/game/utils/sanity_utils';
+import { getCorruptedText } from '@/utils/utils/sanity_utils';
 
 const gameStore = useGameStore();
 

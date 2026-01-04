@@ -13,7 +13,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
-import { useGameStore } from '@/stores/modules/game';
+import { useGameStore } from '@/stores/game';
 
 const gameStore = useGameStore();
 

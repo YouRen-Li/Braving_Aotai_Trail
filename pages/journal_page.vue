@@ -34,7 +34,7 @@
 
 <script setup>
 import { computed, onMounted } from 'vue';
-import { useMetaStore } from '@/stores/modules/meta';
+import { useMetaStore } from '@/stores/meta';
 
 const metaStore = useMetaStore();
 

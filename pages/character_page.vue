@@ -98,9 +98,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { roles } from '@/utils/game/data/roles_data';
-import { items } from '@/utils/game/data/items_data';
-import { useGameStore } from '@/stores/modules/game';
+import { roles } from '@/utils/data/roles_data';
+import { items } from '@/utils/data/items_data';
+import { useGameStore } from '@/stores/game';
 
 const gameStore = useGameStore();
 

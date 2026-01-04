@@ -71,7 +71,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { useGameStore } from '@/stores/modules/game';
+import { useGameStore } from '@/stores/game';
 
 const props = defineProps(['visible']);
 const emit = defineEmits(['update:visible']);
