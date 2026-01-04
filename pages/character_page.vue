@@ -136,7 +136,7 @@ const confirmSelection = () => {
         // Navigate after animation
         setTimeout(() => {
             uni.navigateTo({
-                url: '/pages/game/index',
+                url: '/pages/game_page',
                 fail: (err) => {
                     console.error('Navigation failed:', err);
                     isTransitioning.value = false;

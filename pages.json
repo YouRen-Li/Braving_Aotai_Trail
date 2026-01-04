@@ -8,27 +8,27 @@
   },
   "pages": [
     {
-      "path": "pages/index/index",
+      "path": "pages/home_page",
       "style": {
         "navigationBarTitleText": "首页"
       }
     },
     {
-      "path": "pages/game/index",
+      "path": "pages/game_page",
       "style": {
         "navigationBarTitleText": "勇闯鳌太",
         "navigationStyle": "custom"
       }
     },
     {
-      "path": "pages/character/index",
+      "path": "pages/character_page",
       "style": {
         "navigationBarTitleText": "选择角色",
         "navigationStyle": "custom"
       }
     },
     {
-      "path": "pages/journal/index",
+      "path": "pages/journal_page",
       "style": {
         "navigationBarTitleText": "探险手记",
         "navigationStyle": "custom"

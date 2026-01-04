@@ -58,13 +58,13 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { useGameStore } from '@/stores/modules/game';
-import GameStatus from './components/GameStatus.vue';
-import BagButton from './components/BagButton.vue';
-import InventoryPanel from './components/InventoryPanel.vue';
-import GameOverPanel from './components/GameOverPanel.vue';
-import BackgroundLayer from './components/BackgroundLayer.vue';
-import DayNightOverlay from './components/DayNightOverlay.vue';
-import GameNotification from './components/GameNotification.vue'; // [NEW]
+import GameStatus from '@/pages/components/GameStatus.vue';
+import BagButton from '@/pages/components/BagButton.vue';
+import InventoryPanel from '@/pages/components/InventoryPanel.vue';
+import GameOverPanel from '@/pages/components/GameOverPanel.vue';
+import BackgroundLayer from '@/pages/components/BackgroundLayer.vue';
+import DayNightOverlay from '@/pages/components/DayNightOverlay.vue';
+import GameNotification from '@/pages/components/GameNotification.vue';
 import { useTypewriter } from '@/utils/composables/useTypewriter';
 import { getCorruptedText } from '@/utils/game/utils/sanity_utils';
 
