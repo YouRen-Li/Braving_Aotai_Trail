@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { roles } from '@/utils/game/roles_data';
 import { items } from '@/utils/game/items_data';
 import { useGameStore } from '@/stores/modules/game';
@@ -99,6 +99,13 @@ const gameStore = useGameStore();
 
 const currentIndex = ref(0);
 const currentRole = computed(() => roles[currentIndex.value]);
+
+onMounted(() => {
+    // Randomize initial character on mount
+    if (roles.length > 0) {
+        currentIndex.value = Math.floor(Math.random() * roles.length);
+    }
+});
 
 const onSwiperChange = (e) => {
     currentIndex.value = e.detail.current;
@@ -109,9 +116,32 @@ const getRoleItemNames = (role) => {
 }
 
 const confirmSelection = () => {
-    const roleId = currentRole.value.id;
-    gameStore.initGame(roleId);
-    uni.navigateTo({ url: '/pages/game/index' });
+    try {
+        console.log('Deploy button clicked');
+        const roleId = currentRole.value.id;
+        console.log('Selected Role:', roleId);
+
+        gameStore.initGame(roleId);
+
+        uni.showToast({
+            title: 'DEPLOYING...',
+            icon: 'none',
+            duration: 1000
+        });
+
+        setTimeout(() => {
+            uni.navigateTo({
+                url: '/pages/game/index',
+                fail: (err) => {
+                    console.error('Navigation failed:', err);
+                    uni.showToast({ title: 'Nav Error: ' + JSON.stringify(err), icon: 'none' });
+                }
+            });
+        }, 500); // Small delay for effect
+    } catch (e) {
+        console.error('Error in confirmSelection:', e);
+        uni.showToast({ title: 'Error: ' + e.message, icon: 'none' });
+    }
 };
 </script>
 
@@ -465,14 +495,16 @@ const confirmSelection = () => {
 .btn-deploy {
     background: #ff3333;
     color: #000;
-    padding: 4rpx;
-    /* Border like */
+    padding: 2rpx;
+    /* Thin border */
     cursor: pointer;
-    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.1s;
 
     &:active {
         transform: scale(0.98);
-        filter: brightness(0.8);
+        filter: brightness(1.2);
     }
 }
 
@@ -481,14 +513,47 @@ const confirmSelection = () => {
     color: #ff3333;
     padding: 24rpx 60rpx;
     border: 2px solid #ff3333;
+    /* Inner border */
     font-weight: 900;
     font-size: 32rpx;
     letter-spacing: 4rpx;
     text-transform: uppercase;
+    position: relative;
+    z-index: 2;
 
     &:hover {
         background: #ff3333;
         color: #000;
+    }
+}
+
+.btn-glitch {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 51, 51, 0.5);
+    transform: translateX(-100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.btn-deploy:active .btn-glitch {
+    animation: glitch-slide 0.2s linear;
+}
+
+@keyframes glitch-slide {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    50% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(100%);
     }
 }
 </style>
