@@ -38,7 +38,7 @@
 
     <!-- 操作区 -->
     <view class="action-area" :class="{ disabled: isTyping }">
-      <view v-for="(choice, index) in currentScene.choices" :key="index" class="choice-btn" hover-class="btn-hover"
+      <view v-for="(choice, index) in filteredChoices" :key="index" class="choice-btn" hover-class="btn-hover"
         @click="onChoose(choice)">
         <text class="btn-text" :class="{ 'glitch-text': showGlitch }">{{ corruptedChoiceText(choice.text) }}</text>
         <!-- Removed Cost Hint for Realism -->
@@ -65,6 +65,30 @@ import { getCorruptedText } from '@/utils/game/sanity_utils'; // [NEW]
 
 const gameStore = useGameStore();
 const currentScene = computed(() => gameStore.currentScene);
+// [NEW] Filter choices by role
+const filteredChoices = computed(() => {
+  if (!currentScene.value || !currentScene.value.choices) return [];
+  const roleId = gameStore.player.roleId;
+  return currentScene.value.choices.filter(c => {
+    // 1. Check Role
+    if (c.requiredRole && c.requiredRole !== roleId) return false;
+
+    // 2. [NEW] Check Condition
+    if (c.condition) {
+      const flags = gameStore.worldFlags;
+      // Handle simple 'flag' or '!flag'
+      if (c.condition.startsWith('!')) {
+        const key = c.condition.slice(1);
+        if (flags[key]) return false; // If !flag but flag is true -> hide
+      } else {
+        if (!flags[c.condition]) return false; // If flag but flag is false -> hide
+      }
+    }
+
+    return true;
+  });
+});
+
 const showInventory = ref(false);
 const showDamageFlash = ref(false);
 

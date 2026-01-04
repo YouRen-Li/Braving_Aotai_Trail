@@ -9,6 +9,8 @@ export interface SceneChoice {
   target?: string; // Target scene ID. 'resume' for random events.
   cost?: ChoiceCost;
   action?: string; // Special actions: 'restart', 'rest', 'loot_supplies', 'refill_water', 'look_back'
+  requiredRole?: string; // Only visible if player has this role
+  condition?: string; // [NEW] e.g., 'shuiwozi_water' (must be true in worldFlags) or '!liang2_blocked'
 }
 
 export interface Scene {
@@ -16,7 +18,8 @@ export interface Scene {
   text: string;
   choices: SceneChoice[];
   bg?: string;
-  type?: "normal" | "loot" | "event"; // [NEW] Added for clearer logic classification if needed
+  type?: "normal" | "loot" | "event";
+  weatherText?: Record<string, string>; // [NEW] Key: WeatherType (sunny, storm, etc.)
 }
 
 // --- 真实地图节点扩充版 ---
@@ -30,13 +33,37 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "坐秀才家的拖拉机上山",
-        target: "node_village_road",
-        cost: { hp: 0, hunger: 0 }, // Free ride
+        target: "node_tractor_ride", // Target the new intermediate node for narrative flow
+        cost: { hp: 0, hunger: 0 },
       },
       {
         text: "徒步前往登山口",
+        target: "node_hike_feedback", // Target feedback node
+        cost: { hunger: 2, hp: 0 },
+      },
+    ],
+  },
+
+  node_tractor_ride: {
+    id: "node_tractor_ride",
+    text: "拖拉机突突突地冒着黑烟，颠簸得像在骑马。虽然屁股受罪，但好歹省下了几公里爬坡的力气。秀才回头喊道：“这几天有雨，此时回头还来得及！”",
+    bg: "loc_tractor_road",
+    choices: [
+      {
+        text: "谢过秀才，下车",
         target: "node_village_road",
-        cost: { hunger: 2, hp: 0 }, // Reduced cost
+      },
+    ],
+  },
+
+  node_hike_feedback: {
+    id: "node_hike_feedback",
+    text: "还没进山，水泥路的上坡就让你气喘吁吁。背包带勒进肩膀，由于还没热身，每一步都显得格外沉重。\n(状态反馈：饱食度 -2)",
+    bg: "loc_village",
+    choices: [
+      {
+        text: "调整呼吸，继续",
+        target: "node_village_road",
       },
     ],
   },
@@ -49,12 +76,12 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "加快脚步热身",
         target: "node_river_crossing",
-        cost: { hunger: 2 }, // Reduced
+        cost: { hunger: 2 },
       },
       {
         text: "检查背包",
         target: "node_river_crossing",
-        cost: { hunger: 1 }, // Reduced
+        cost: { hunger: 1 },
       },
     ],
   },
@@ -62,17 +89,23 @@ const mapScenes: Record<string, Scene> = {
   node_river_crossing: {
     id: "node_river_crossing",
     text: "唯一的补水点。泉水冰冷刺骨，但能救命。你需要在这里补充水源。",
-    bg: "loc_river", // Updated
+    bg: "loc_river",
     choices: [
       {
         text: "踩着石头跳过去",
         target: "node_forest_entry",
-        cost: { hunger: -5, sanity: 2 }, // Drink water
+        cost: { hunger: 3, sanity: 2 },
       },
       {
         text: "脱鞋涉水",
         target: "node_forest_entry",
-        cost: { hp: 2, hunger: -5 }, // Drink water
+        cost: { hp: 2, hunger: 2 },
+      },
+      {
+        text: "[退伍军人] 搭建简易绳桥通过",
+        requiredRole: "veteran",
+        target: "node_forest_entry",
+        cost: { hunger: 1 },
       },
     ],
   },
@@ -85,13 +118,13 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "保持节奏爬升",
         target: "node_forest_climb",
-        cost: { hunger: 5, hp: 2 }, // Reduced from 10
+        cost: { hunger: 5, hp: 2 },
       },
       {
         text: "回头看一眼山下的村庄",
         action: "look_back",
         target: "node_forest_climb",
-        cost: { hunger: 3, sanity: -5 }, // Reduced from 5
+        cost: { hunger: 3, sanity: -5 },
       },
     ],
   },
@@ -104,7 +137,7 @@ const mapScenes: Record<string, Scene> = {
       { text: "咬牙坚持", target: "node_2900", cost: { hunger: 15, hp: 5 } },
       {
         text: "喝口水继续赶路",
-        cost: { hp: -5, hunger: -5 },
+        cost: { hp: -5, hunger: 5 },
         target: "node_2900",
       },
     ],
@@ -153,19 +186,19 @@ const mapScenes: Record<string, Scene> = {
     bg: "loc_penjing",
     choices: [
       {
-        text: "给家人打电话 (理智+20)",
+        text: "给家人打电话",
         target: "node_baiqi_start",
         cost: { sanity: -20 },
       },
       {
-        text: "下沟取水 (耗时，获得物资)",
-        target: "node_penjing_gully", // Detour
+        text: "下沟取水",
+        target: "node_penjing_gully",
         cost: { hunger: 5 },
       },
       {
         text: "继续赶路",
         target: "node_baiqi_start",
-        cost: { hunger: 15, hp: 5 }, // Reduced hunger 20->15
+        cost: { hunger: 15, hp: 5 },
       },
     ],
   },
@@ -179,7 +212,7 @@ const mapScenes: Record<string, Scene> = {
         text: "搜刮物资并返回值路",
         action: "loot_supplies",
         target: "node_baiqi_start",
-        cost: { hunger: 10, hp: 5 }, // Cost for the climb back
+        cost: { hunger: 10, hp: 5 },
       },
     ],
   },
@@ -191,7 +224,7 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "轻松翻越石海",
-        target: "node_baiqi_middle",
+        target: "node_baiqi_middle", // Added intermediate node logic back from 2f007a7 but simplified to target nav_stand if middle missing? No, 2f007a7 had node_baiqi_middle. I'll include it.
         cost: { hunger: 5 },
       },
     ],
@@ -227,7 +260,7 @@ const mapScenes: Record<string, Scene> = {
       },
       {
         text: "迷信直觉，直走",
-        target: "end_lost_23km", // New dead end? Or just punishment
+        target: "end_lost_23km",
         cost: { hunger: 20, sanity: 20 },
       },
     ],
@@ -248,7 +281,7 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "强行翻越石海",
         target: "node_knife_ridge",
-        cost: { hunger: 20, hp: 15, sanity: 5 },
+        cost: { hunger: 20, hp: 15, sanity: -5 },
       },
     ],
   },
@@ -256,12 +289,17 @@ const mapScenes: Record<string, Scene> = {
   node_knife_ridge: {
     id: "node_knife_ridge",
     text: "小心通过了刀刃梁。当你看到挂在石头上的“胸罩”标记时，意味着麦秸岭最危险的路段已经结束了。前方是一路下坡。",
+    weatherText: {
+      storm:
+        "狂风夹杂着冰粒像鞭子一样抽打在脸上。你只能匍匐前进，生怕一阵风把你吹下万丈深渊。路标已经被雪掩埋了一半。",
+      fog: "除了脚下的那一小块石头，你什么都看不见。世界是一片白色的虚无，左边是悬崖，右边也是悬崖。恐惧来自于未知。",
+    },
     bg: "loc_knife_ridge",
     choices: [
       {
         text: "长舒一口气，滑下碎石坡",
         target: "node_shuiwozi_source",
-        cost: { hunger: 5, sanity: -5 }, // Sanity restore
+        cost: { hunger: 5, sanity: 5 },
       },
     ],
   },
@@ -275,11 +313,18 @@ const mapScenes: Record<string, Scene> = {
         text: "左下切去营地取水",
         target: "node_shuiwozi_camp",
         cost: { hunger: 5 },
+        condition: "shuiwozi_water", // Show if water exists
+      },
+      {
+        text: "左下切去营地",
+        target: "node_shuiwozi_dry",
+        cost: { hunger: 10, sanity: 5 },
+        condition: "!shuiwozi_water", // Show if dry
       },
       {
         text: "垭口无水扎营",
-        target: "node_plane_wreck", // Implies a harder start next day or skipping water
-        cost: { hunger: 10, sanity: 5 },
+        target: "node_plane_wreck",
+        cost: { hunger: 10, sanity: -5 },
       },
     ],
   },
@@ -301,6 +346,20 @@ const mapScenes: Record<string, Scene> = {
     ],
   },
 
+  node_shuiwozi_dry: {
+    id: "node_shuiwozi_dry",
+    text: "你艰难地下到沟底，却发现水源早已干涸。希望破灭了。你只能在乱石堆中勉强找个平地扎营，干粮像沙砾一样难以下咽。",
+    bg: "loc_camp",
+    choices: [
+      {
+        text: "苦熬一夜",
+        action: "rest",
+        target: "node_shuiwozi_morning",
+        cost: { hp: 5, sanity: 15 },
+      },
+    ],
+  },
+
   node_shuiwozi_morning: {
     id: "node_shuiwozi_morning",
     text: "清晨的云海翻腾。收拾好装备，沿着营地旁的小路直接切上飞机梁。今天是过梁的一天。",
@@ -316,10 +375,10 @@ const mapScenes: Record<string, Scene> = {
     bg: "loc_plane_wreck",
     choices: [
       {
-        text: "查看残骸与纪念碑 (可能发现物资)",
+        text: "查看残骸与纪念碑",
         target: "node_liang1",
         cost: { sanity: 5 },
-        action: "loot_supplies", // Added chance for loot
+        action: "loot_supplies",
       },
       { text: "不看，直接前往梁1", target: "node_liang1" },
     ],
@@ -327,7 +386,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_liang1: {
     id: "node_liang1",
-    text: "【梁1】左切。遇到一个一人高的台阶，踏脚处仅有四五十厘米，左边就是悬崖。这对于重装驴友是极大的心理考验。",
+    text: "左切。遇到一个一人高的台阶，踏脚处仅有四五十厘米，左边就是悬崖。这对于重装驴友是极大的心理考验。",
     bg: "loc_stone_sea",
     choices: [
       {
@@ -345,13 +404,20 @@ const mapScenes: Record<string, Scene> = {
 
   node_liang2: {
     id: "node_liang2",
-    text: "【梁2】岔路口。左切是先下一个2米深的陡坡滑下去，再拔高；右切则是横穿一片稳固的石海。两条路殊途同归。",
+    text: "岔路口。左切是先下一个2米深的陡坡滑下去，再拔高；右切则是横穿一片稳固的石海。两条路殊途同归。",
     bg: "loc_stone_sea",
     choices: [
       {
         text: "右切走石海",
         target: "node_liang3",
         cost: { hunger: 10 },
+        condition: "!liang2_blocked",
+      },
+      {
+        text: "右切石海 (塌方不可行)",
+        target: "node_stone_sea_climb",
+        cost: { hunger: 5, sanity: 5 },
+        condition: "liang2_blocked",
       },
       {
         text: "左切滑下陡坡",
@@ -361,9 +427,22 @@ const mapScenes: Record<string, Scene> = {
     ],
   },
 
+  node_stone_sea_climb: {
+    id: "node_stone_sea_climb",
+    text: "常规的横切路线被完全阻断。你不得不向下绕行乱石堆。每踩一步，石头都在晃动，发出令人胆寒的撞击声。这一绕，多耗费了一个小时。",
+    bg: "loc_stone_sea",
+    choices: [
+      {
+        text: "终于绕回主路，继续前进",
+        target: "node_liang3",
+        cost: { hunger: 10, hp: 5 },
+      },
+    ],
+  },
+
   node_liang3: {
     id: "node_liang3",
-    text: "【梁3】继续右切。连过三梁，体能消耗巨大。前方就是今天的营地了。",
+    text: "继续右切。连过三梁，体能消耗巨大。前方就是今天的营地了。",
     bg: "loc_stone_sea",
     choices: [
       {
@@ -392,7 +471,7 @@ const mapScenes: Record<string, Scene> = {
     ],
   },
 
-  // === 第四章：迷途与塔石连走 (Day 4: The Towers) ===
+  // === 第五章：朝圣 ===
 
   node_pyramid_ascent: {
     id: "node_pyramid_ascent",
@@ -400,20 +479,20 @@ const mapScenes: Record<string, Scene> = {
     bg: "loc_stone_sea",
     choices: [
       {
-        text: "调整呼吸，缓慢爬升",
+        text: "开始漫长的攀爬",
         target: "node_pyramid",
-        cost: { hunger: 10, hp: 5 },
+        cost: { hunger: 15 },
       },
     ],
   },
 
   node_pyramid: {
     id: "node_pyramid",
-    text: "金字塔顶。远眺前方，塔1两侧山体陡峭对称，形状完美。去往塔1的路主要靠右切。",
+    text: "金字塔顶。远眺前方，塔1、塔2、塔3如恐龙脊背般排列。",
     bg: "loc_ridge",
     choices: [
       {
-        text: "右切前往塔1",
+        text: "向塔1进发",
         target: "node_ta1",
         cost: { hunger: 5 },
       },
@@ -422,43 +501,43 @@ const mapScenes: Record<string, Scene> = {
 
   node_ta1: {
     id: "node_ta1",
-    text: "【塔1】右切路上经过一个造型奇特的岩石。很多路段只能容纳一只脚，非常难走。若遇风雨，更是雪上加霜。",
+    text: "塔1。巨石林立，路窄且滑。",
     bg: "loc_ridge",
     choices: [
       {
-        text: "小心通过窄路",
+        text: "小心通过",
         target: "node_ta2",
-        cost: { hunger: 10, hp: 5 },
+        cost: { hunger: 8, hp: 2 },
       },
     ],
   },
 
   node_ta2: {
     id: "node_ta2",
-    text: "【塔2】到达左切路口。这里的路线最终是要登顶翻越的。",
+    text: "塔2。需要在乱石中寻找路标。",
     bg: "loc_ridge",
     choices: [
       {
-        text: "登顶翻越塔2",
+        text: "顶风翻越",
         target: "node_ta3",
-        cost: { hunger: 15, hp: 5 },
+        cost: { hunger: 10, hp: 5 },
       },
     ],
   },
 
   node_ta3: {
     id: "node_ta3",
-    text: "【塔3】右切通过。路下方有好几处水源。注意：下一站西源营地大概率没水。如果打算在那里扎营，必须在此背水。",
+    text: "塔3。如果西源营地没水，后果不堪设想。是否下路取水？",
     bg: "loc_spring_water",
     choices: [
       {
-        text: "下路取水背负",
+        text: "下撤取水背负",
         action: "loot_supplies",
         target: "node_xiyuan",
-        cost: { hunger: 10, hp: 5 },
+        cost: { hunger: 15, hp: 5 },
       },
       {
-        text: "赌一把，直接去西源",
+        text: "赌西源有水，直接走",
         target: "node_xiyuan",
         cost: { hunger: 5 },
       },
@@ -467,244 +546,221 @@ const mapScenes: Record<string, Scene> = {
 
   node_xiyuan: {
     id: "node_xiyuan",
-    text: "到达西源营地。水源在左下方，是季节性的。果然，七月份这里干枯无水。",
+    text: "西源营地。干涸的河床在夕阳下通红。",
     bg: "loc_camp",
     choices: [
       {
-        text: "用刚才背的水扎营",
+        text: "因为背了水，安心扎营",
         action: "rest",
         target: "node_stone_sea_9",
       },
       {
-        text: "无水，只能强行翻越九重石海",
+        text: "没水，强行翻九重石海",
         target: "node_stone_sea_9",
-        cost: { hunger: 20, sanity: 10 },
+        cost: { hunger: 30, sanity: 20, hp: 10 },
       },
     ],
   },
 
   node_stone_sea_9: {
     id: "node_stone_sea_9",
-    text: "【九重石海】鳌太必经之路。三面石海连着太白梁，状如迎风破浪的巨舰。只能从“船头”正面硬爬。石头稳固，但极为漫长。",
+    text: "第五天全是石头。九重石海，那种地狱般的折磨。",
     bg: "loc_stone_sea_giant_ship",
     choices: [
       {
-        text: "一步步爬上“船头”",
+        text: "机械地向上攀爬",
+        target: "node_stone_sea_climb_feedback",
+        cost: { hunger: 10 },
+      },
+      {
+        text: "[运动员] 爆发式匀速攀登",
+        requiredRole: "athlete",
+        target: "node_stone_sea_climb_feedback",
+        cost: { hunger: 5 }, // Efficient
+      },
+    ],
+  },
+
+  node_stone_sea_climb_feedback: {
+    id: "node_stone_sea_climb_feedback",
+    text: "还剩八层。大腿肌肉在燃烧。\n(状态反馈：饱食度大幅下降)",
+    bg: "loc_stone_sea_giant_ship",
+    choices: [
+      {
+        text: "喝口水，继续爬",
         target: "node_dashihe",
-        cost: { hunger: 20, hp: 10 },
+        cost: { hunger: 15, hp: 5 },
       },
     ],
   },
 
   node_dashihe: {
     id: "node_dashihe",
-    text: "下午18:10。翻过九重石海，经过干枯的东源，终于到达大石河营地。这里有巨大的活水，成功在望！",
+    text: "大石河。流水声简直是世界上最美妙的音乐。",
     bg: "loc_camp",
     choices: [
       {
-        text: "扎营狂欢",
+        text: "狂饮河水，扎营",
         action: "rest",
         target: "node_wanxian",
       },
     ],
   },
 
-  // === 第五章：朝圣与分道 (Day 5: Pilgrimage & The Split) ===
-
   node_wanxian: {
     id: "node_wanxian",
-    text: "早上7:18出发。经过雷公庙，开始爬升万仙阵。沿途出现了许多玛尼堆。石海路经过修整，虽然要爬升1小时，但心情格外轻松。",
+    text: "早晨出发，走过万仙阵，前方就是太白最高峰——拔仙台。",
     bg: "loc_wanxian",
     choices: [
       {
-        text: "向着最高峰前进",
+        text: "前行",
         target: "node_summit_fork",
-        cost: { hunger: 10, hp: 5 },
+        cost: { hunger: 5 },
       },
     ],
   },
 
   node_summit_fork: {
     id: "node_summit_fork",
-    text: "到达岔路口。左边直通大爷海，右边先上拔仙台顶再下到大爷海。来都来了，怎能不登顶？",
+    text: "岔路口。左边去大爷海，右边去拔仙台顶峰。",
     bg: "loc_ridge",
     choices: [
       {
-        text: "右转登顶拔仙台",
+        text: "右转登顶",
         target: "node_baxiantai",
         cost: { hunger: 10, hp: 5 },
       },
       {
-        text: "左转直奔大爷海",
+        text: "直奔大爷海",
         target: "node_daye_lake",
         cost: { hunger: 5 },
       },
     ],
   },
 
-  node_fog_entry: {
-    id: "node_fog_entry",
-    text: "走进冷杉林，浓雾突然涌来，能见度瞬间降到五米以内。路迹消失了。",
-    bg: "bg_fog",
-    choices: [
-      {
-        text: "拿出指北针确认方向",
-        target: "node_fog_deep",
-        cost: { sanity: -5 },
-      },
-      { text: "凭直觉走", target: "node_fog_deep", cost: { sanity: 5 } },
-    ],
-  },
-
-  node_fog_deep: {
-    id: "node_fog_deep",
-    text: "能见度不足5米。你来到了著名的迷魂阵。四周的景色一模一样，没有路标，只有风声。",
-    bg: "bg_fog",
-    choices: [
-      {
-        text: "寻找树上的红布条",
-        target: "node_xitaibai",
-        cost: { hunger: 20, sanity: -10 }, // Relief
-      },
-      {
-        text: "冷静下来，观察兽道",
-        target: "node_xitaibai",
-        cost: { hunger: 15, sanity: -5 }, // Calm/Relief
-      },
-    ],
-  },
-
-  // === 第五章：朝圣  ===
-
-  node_xitaibai: {
-    id: "node_xitaibai",
-    text: "这里有雷公庙的断壁残垣。古人敬畏自然，在此设庙。太白绝顶就在前方了。",
-    bg: "loc_temple", // Updated
-    choices: [
-      {
-        text: "捡一块石头祭拜",
-        target: "node_daye_lake",
-        cost: { sanity: -10 },
-      },
-      { text: "继续赶路", target: "node_daye_lake", cost: { hunger: 10 } },
-    ],
-  },
-
   node_baxiantai: {
     id: "node_baxiantai",
-    text: "【拔仙台】海拔3767.2米！看着满地的残垣断壁，俯视着秦川大地。你告诉自己：梦想总会实现，一切皆有可能。",
+    text: "拔仙台。海拔3767.2米。秦岭之巅。",
+    weatherText: {
+      storm:
+        "海拔3767.2米。没有云海，只有呼啸的死神。这里是生命的禁区。你必须立刻下撤，否则会被冻成冰雕。",
+      sunny:
+        "海拔3767.2米。秦岭之巅。脚下的云海波澜壮阔，金色的阳光洒满全身。这一刻，你觉得自己是世界的主宰。",
+    },
     bg: "loc_baxiantai_ruins",
-    choices: [{ text: "带着自豪下撤至大爷海", target: "node_daye_lake" }],
+    choices: [
+      {
+        text: "下撤",
+        target: "node_daye_lake",
+      },
+    ],
   },
 
   node_daye_lake: {
     id: "node_daye_lake",
-    text: "群峰环绕的高山明珠——大爷海。这里有接待站，饭菜虽贵但能救急。喝一瓶20元的可乐，是鳌太穿越最具象征意义的仪式。",
+    text: "大爷海。深蓝色的湖水像一颗宝石。湖边的接待站散发着泡面的香气。",
     bg: "loc_daye_lake",
     choices: [
       {
-        text: "购买食物和可乐 (20元，饱食+30，理智+20)",
+        text: "奢侈一把，买吃买喝",
         target: "node_wengong",
-        cost: { hunger: -30, sanity: -20 },
+        cost: { hunger: -50, sanity: -50 },
       },
-      { text: "不消费，继续赶路", target: "node_wengong", cost: { hunger: 5 } },
+      {
+        text: "继续赶路",
+        target: "node_wengong",
+        cost: { hunger: 5 },
+      },
     ],
   },
 
   node_wengong: {
     id: "node_wengong",
-    text: "通往文公庙的路已经是景区步道。到达大文公庙，队伍在此分道：直行去坐索道下山（小鳌太），左行去鹦鸽镇（大鳌太）。",
+    text: "文公庙。基本算走出了无人区。这里是分界线。",
     bg: "loc_wengong_temple",
     choices: [
       {
-        text: "直行：坐索道下山 (结束旅程)",
+        text: "直接坐索道下山",
         target: "end_success",
       },
       {
-        text: "左行：继续大鳌太 (前往明星寺)",
+        text: "走完大鳌太全程",
         target: "node_fangyang",
-        cost: { hunger: 10, hp: 5 },
+        cost: { hunger: 10 },
       },
     ],
   },
 
   node_fangyang: {
     id: "node_fangyang",
-    text: "下山一路穿行在红杉林中。到达放羊寺，果然没找到水。还要走1.5小时才能到今天的营地。",
+    text: "下到放羊寺，膝盖开始剧烈疼痛。",
     bg: "loc_fangyang_temple",
     choices: [
       {
-        text: "咬牙坚持",
+        text: "坚持走下去",
         target: "node_mingxing",
-        cost: { hunger: 15, sanity: 5 },
+        cost: { hunger: 10, hp: 5 },
       },
     ],
   },
 
   node_mingxing: {
     id: "node_mingxing",
-    text: "下午18:00，抵达明星寺。水源在崖壁下方。今天是第五天，最艰难的时刻已经过去，明天就是出山的日子。",
+    text: "明星寺。最后一晚的营地。",
     bg: "loc_mingxing_temple",
     choices: [
       {
-        text: "扎营，期待明天",
+        text: "安然入睡",
         action: "rest",
         target: "node_mingxing_morning",
       },
     ],
   },
 
-  // === 第六章：出山 (Day 6: The Return) ===
-
   node_mingxing_morning: {
     id: "node_mingxing_morning",
-    text: "早上7:20出发。今天要走13公里，预计下午13:10到达南源村。心情格外轻松，归心似箭。",
+    text: "一路狂奔下山。平安寺之后，就是无尽的土路下坡。",
     bg: "loc_forest",
     choices: [
       {
-        text: "前往平安寺 (2小时)",
-        target: "node_pingan",
-        cost: { hunger: 5 },
-      },
-    ],
-  },
-
-  node_pingan: {
-    id: "node_pingan",
-    text: "抵达平安寺。从这里开始，一路是4小时的疯狂下坡。路太陡了，想找块平坦的地方坐下休息都难。",
-    bg: "loc_pingan_temple",
-    choices: [
-      {
-        text: "一口气冲下山",
-        target: "node_yangpi_gully",
-        cost: { hunger: 10, hp: 5 },
-      },
-    ],
-  },
-
-  node_yangpi_gully: {
-    id: "node_yangpi_gully",
-    text: "看到警示牌后，沿着“羊皮沟”的溪谷伴行。溪水潺潺，文明世界的气息越来越浓。",
-    bg: "loc_yangpi_gully",
-    choices: [
-      {
-        text: "走出大山",
+        text: "冲向终点",
         target: "node_exit_village",
+        cost: { hunger: 10 },
+      },
+    ],
+  },
+
+  node_fog_entry: {
+    id: "node_fog_entry",
+    text: "【突发迷雾】\n一阵妖风刮过，四周瞬间白茫茫一片。能见度不足5米。你听到了类似人说话的声音，但周围明明没有人。",
+    bg: "bg_fog",
+    choices: [
+      {
+        text: "查看指北针",
+        target: "node_plane_wreck",
+        cost: { sanity: -5 },
+      },
+      {
+        text: "吓得乱跑",
+        target: "end_lost_23km",
+        cost: { sanity: 20 },
+      },
+      {
+        text: "[大学生] 掏出手机查看离线地图",
+        requiredRole: "student",
+        target: "node_plane_wreck",
+        cost: { sanity: -5 },
       },
     ],
   },
 
   node_exit_village: {
     id: "node_exit_village",
-    text: "【出山】下午13:10，你抵达了南源村农家乐。你也终于完成了此次大鳌太穿越！接下来怎么回西安？",
+    text: "水泥路出现了！农家乐的招牌，汽车的喇叭声，饭菜的香味。你活着走出来了。",
     bg: "loc_village",
     choices: [
       {
-        text: "包车去岐山坐动车 (快，推荐)",
-        target: "end_game_cleared",
-      },
-      {
-        text: "包车去眉县坐大巴 (慢)",
+        text: "包车回家",
         target: "end_game_cleared",
       },
     ],
@@ -712,21 +768,22 @@ const mapScenes: Record<string, Scene> = {
 
   end_game_cleared: {
     id: "end_game_cleared",
-    text: "无论选择哪种方式回家，当你坐在舒适的座椅上，回望那连绵的秦岭雪线时，你知道这段记忆将终生难忘。",
+    text: "在车上沉沉睡去。鳌太，不再是一个地名，而成了你生命中的一部分勋章。",
     bg: "bg_sunny",
     choices: [{ text: "旅途圆满结束" }],
   },
 
   // --- Endings ---
+
   end_success: {
     id: "end_success",
-    text: "顺着游人如织的台阶路下山，你恍如隔世。你满身泥泞，在游客惊讶的目光中走出了大山。你活着，并且战胜了自己。",
+    text: "【小鳌太完成】\n虽然没有走完全程，但能安全出山已是胜利。缆车下山的那一刻，看着脚下的万丈深渊，你庆幸自己活着。",
     bg: "bg_sunny",
     choices: [{ text: "徒步结束", action: "restart" }],
   },
   end_retreat: {
     id: "end_retreat",
-    text: "【明智之选】山永远在那里，生命只有一次。你做出了艰难但正确的决定——下撤。回望云雾缭绕的主峰，你知道自己还会回来的。",
+    text: "【明智下撤】\n山就在那里，不会跑。今天的下撤，是为了明天更好的攀登。活着回来，比登顶更重要。",
     bg: "loc_village",
     choices: [{ text: "徒步结束", action: "restart" }],
   },
@@ -754,6 +811,12 @@ const mapScenes: Record<string, Scene> = {
     bg: "bg_fog",
     choices: [{ text: "徒步结束", action: "restart" }],
   },
+  end_lost_23km: {
+    id: "end_lost_23km",
+    text: "【失踪】你虽然走了直路，却越走越偏。这是著名的“23公里跑道”，一条通往死亡的单行道。没人知道你去了哪里。",
+    bg: "bg_fog",
+    choices: [{ text: "徒步结束", action: "restart" }],
+  },
   end_caught: {
     id: "end_caught",
     text: "【被捕】你被巡山队带回了派出所。写下保证书，缴纳罚款3000元，并被列入黑名单。这一趟“非法穿越”终究以闹剧收场。",
@@ -764,12 +827,6 @@ const mapScenes: Record<string, Scene> = {
     id: "end_rescue",
     text: "【获救】只有亲历者才知道等待救援的那十几个小时有多绝望。获救了，但“驴友”的名声又多了一笔负面教材。",
     bg: "loc_camp",
-    choices: [{ text: "徒步结束", action: "restart" }],
-  },
-  end_lost_23km: {
-    id: "end_lost_23km",
-    text: "【失踪】你虽然走了直路，却越走越偏。这是著名的“23公里跑道”，一条通往死亡的单行道。没人知道你去了哪里。",
-    bg: "bg_fog",
     choices: [{ text: "徒步结束", action: "restart" }],
   },
 };
@@ -785,11 +842,17 @@ const eventScenes: Record<string, Scene> = {
         text: "分他半瓶水",
         cost: { hunger: 10, sanity: -10 },
         target: "resume",
-      }, // +Karma
-      { text: "自身难保，离开", cost: { sanity: 10 }, target: "resume" }, // Guilt
+      },
+      { text: "自身难保，离开", cost: { sanity: 10 }, target: "resume" },
       {
         text: "尝试帮他求救",
-        cost: { hp: 20, hunger: 20, sanity: -15 },
+        cost: { hp: 20, hunger: 20, sanity: -5 },
+        target: "resume",
+      },
+      {
+        text: "[医生] 实施专业急救",
+        requiredRole: "doctor",
+        cost: { hunger: 5, sanity: -20 },
         target: "resume",
       },
     ],
@@ -853,12 +916,12 @@ const eventScenes: Record<string, Scene> = {
     bg: "evt_frozen_body",
     choices: [
       { text: "搜寻遗物", action: "loot_supplies", target: "resume" },
-      { text: "默哀并离开", cost: { hunger: 5, sanity: -5 }, target: "resume" },
+      { text: "默哀并离开", cost: { hunger: 5, sanity: 10 }, target: "resume" },
     ],
   },
   evt_takin: {
     id: "evt_takin",
-    text: "一头体型硕大的秦岭羚牛挡在了独木桥上。它盯着你，鼻孔喷着白气。这种独行公牛极具攻击性。",
+    text: "一头体型硕大的秦岭羚牛挡在了由独木桥上。它盯着你，鼻孔喷着白气。这种独行公牛极具攻击性。",
     bg: "evt_takin_beast",
     choices: [
       {
@@ -888,7 +951,7 @@ const eventScenes: Record<string, Scene> = {
   },
   evt_gear_failure: {
     id: "evt_gear_failure",
-    text: "突然脚下一软，你发现登山鞋的鞋底甚至脱胶了，“张开了大嘴”。这是鳌太路上最令人崩溃的装备故障之一。",
+    text: "突然脚下一软，你发现登山鞋的甚至脱胶了，“张开了大嘴”。这是鳌太路上最令人崩溃的装备故障之一。",
     bg: "evt_broken_shoe",
     choices: [
       {
@@ -910,12 +973,12 @@ const eventScenes: Record<string, Scene> = {
     choices: [
       {
         text: "感激地喝掉",
-        cost: { hunger: -10, sanity: -5 },
+        cost: { hunger: -10, sanity: 5 },
         target: "resume",
       },
       {
         text: "留给更需要的人",
-        cost: { sanity: -15 }, // Karma boost
+        cost: { sanity: 15 }, // Karma boost
         target: "resume",
       },
     ],
@@ -960,7 +1023,6 @@ export const scenes: Record<string, Scene> = {
 };
 
 export const randomEventIds = [
-  "evt_tent",
   "evt_hiker",
   "evt_storm",
   "evt_ranger",

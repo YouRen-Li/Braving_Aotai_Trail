@@ -43,6 +43,11 @@ interface GameState {
   };
   weather: WeatherType;
   history: string[];
+  worldFlags: {
+    // [NEW] Randomized world state
+    shuiwozi_water: boolean; // true = has water
+    liang2_blocked: boolean; // true = landslide
+  };
 }
 
 export const useGameStore = defineStore("game", {
@@ -87,22 +92,43 @@ export const useGameStore = defineStore("game", {
 
     // 历史记录 (用于回放或结算)
     history: [],
+
+    // 世界随机状态
+    worldFlags: {
+      shuiwozi_water: true, // Default, will be randomized in init
+      liang2_blocked: false,
+    },
   }),
 
   getters: {
-    currentScene: (state): Scene =>
-      scenes[state.currentSceneId] || scenes["start_001"],
-    isAlive: (state): boolean => state.status.hp > 0 && state.status.sanity > 0,
-    currentWeatherInfo: (state) => weatherData[state.weather],
+    currentScene: (state: GameState): Scene => {
+      const scene = scenes[state.currentSceneId] || scenes["start_001"];
+      // [NEW] Dynamic Weather Text override
+      if (scene.weatherText && scene.weatherText[state.weather]) {
+        return {
+          ...scene,
+          text: scene.weatherText[state.weather],
+        };
+      }
+      return scene;
+    },
+    isAlive: (state: GameState): boolean =>
+      state.status.hp > 0 && state.status.sanity > 0,
+    currentWeatherInfo: (state: GameState) => weatherData[state.weather],
+
+    // Helper to check if item exists
+    hasItem: (state: GameState) => (itemId: string) => {
+      return state.inventory.some((i) => i.id === itemId);
+    },
 
     // Vision Check
-    hasVision: (state): boolean => {
+    hasVision: (state: GameState): boolean => {
       if (!state.status.isNight) return true; // Day = Vision
       return state.equipment.head?.id === "gear_headlamp_01"; // Night needs Lamp
     },
 
     // 统计总属性
-    totalStats: (state): ItemStats => {
+    totalStats: (state: GameState): ItemStats => {
       let warmth = 0;
       let speed = 0;
       Object.values(state.equipment).forEach((item) => {
@@ -115,21 +141,23 @@ export const useGameStore = defineStore("game", {
     },
 
     // [NEW] Role Traits
-    playerTraits: (state): string[] => {
-      const role = roles.find((r) => r.id === state.player.roleId);
+    playerTraits: (state: GameState): string[] => {
+      const roleId = state.player.roleId;
+      if (!roleId) return [];
+      const role = roles.find((r: Role) => r.id === roleId);
       return role ? role.traits : [];
     },
   },
 
   actions: {
     // 初始化游戏 [UPDATED]
-    initGame(roleId: string = "student") {
+    initGame(this: any, roleId: string = "student") {
       const metaStore = useMetaStore();
       metaStore.loadMeta();
       metaStore.incrementRun();
 
       // Find Role
-      const role = roles.find((r) => r.id === roleId) || roles[0];
+      const role = roles.find((r: Role) => r.id === roleId) || roles[0];
 
       this.gameState = "playing";
       this.currentSceneId = "start_001";
@@ -156,16 +184,24 @@ export const useGameStore = defineStore("game", {
       this.history = [];
 
       // Items from Role
-      role.items.forEach((itemId) => this.gainItem(itemId));
+      role.items.forEach((itemId: string) => this.gainItem(itemId));
 
       audioManager.playBGM("sunny");
+
+      // [NEW] Randomize World Flags
+      this.worldFlags = {
+        shuiwozi_water: Math.random() > 0.4, // 60% Chance of water
+        liang2_blocked: Math.random() > 0.8, // 20% Chance of blocked path
+      };
+
+      console.log("World Flags:", this.worldFlags);
 
       this.saveGame();
       console.log("Game Initialized with role:", role.name);
     },
 
     // 获得物品
-    gainItem(itemId: string) {
+    gainItem(this: any, itemId: string) {
       const item = items[itemId];
       if (item) {
         this.inventory.push({ ...item });
@@ -177,7 +213,7 @@ export const useGameStore = defineStore("game", {
     },
 
     // 使用/装备物品
-    useItem(index: number) {
+    useItem(this: any, index: number) {
       const item = this.inventory[index];
       if (!item) return;
 
@@ -235,7 +271,7 @@ export const useGameStore = defineStore("game", {
     },
 
     // 装备逻辑
-    equipItem(index: number) {
+    equipItem(this: any, index: number) {
       const item = this.inventory[index];
       if (!item || !item.slot) return;
 
@@ -253,7 +289,7 @@ export const useGameStore = defineStore("game", {
     },
 
     // 卸下逻辑
-    unequipItem(slot: "head" | "body" | "feet" | "hand") {
+    unequipItem(this: any, slot: "head" | "body" | "feet" | "hand") {
       const item = this.equipment[slot];
       if (item) {
         this.equipment[slot] = null;
@@ -455,7 +491,7 @@ export const useGameStore = defineStore("game", {
           // [MORAL DILEMMA] Cursed Items check
           // If player has 'relic_watch' (Dead man's watch), resting is less effective/painful
           const hasCursedItem = this.inventory.some(
-            (i) => i.id === "relic_watch"
+            (i: Item) => i.id === "relic_watch"
           );
 
           if (hasCursedItem) {
