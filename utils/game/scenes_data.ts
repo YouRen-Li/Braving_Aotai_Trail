@@ -203,7 +203,7 @@ const mapScenes: Record<string, Scene> = {
         cost: { hunger: 5 },
       },
       {
-        text: "迷信直觉，直走 (错误)",
+        text: "迷信直觉，直走",
         target: "end_lost_23km", // New dead end? Or just punishment
         cost: { hunger: 20, sanity: -20 },
       },
@@ -254,7 +254,7 @@ const mapScenes: Record<string, Scene> = {
         cost: { hunger: 5 },
       },
       {
-        text: "垭口无水扎营 (需自带水)",
+        text: "垭口无水扎营",
         target: "node_plane_wreck", // Implies a harder start next day or skipping water
         cost: { hunger: 10, sanity: -5 },
       },
@@ -321,12 +321,12 @@ const mapScenes: Record<string, Scene> = {
     bg: "loc_stone_sea",
     choices: [
       {
-        text: "右切走石海 (推荐，较快)",
+        text: "右切走石海",
         target: "node_liang3",
         cost: { hunger: 10 },
       },
       {
-        text: "左切滑下陡坡 (较慢)",
+        text: "左切滑下陡坡",
         target: "node_liang3",
         cost: { hunger: 15, hp: 5 },
       },
@@ -352,12 +352,12 @@ const mapScenes: Record<string, Scene> = {
     bg: "loc_forest",
     choices: [
       {
-        text: "扎营 (恢复体力)",
+        text: "扎营",
         action: "rest",
         target: "node_pyramid_ascent",
       },
       {
-        text: "连夜赶路 (极度危险)",
+        text: "连夜赶路",
         target: "node_fog_entry",
         cost: { sanity: -50 },
       },
@@ -424,7 +424,7 @@ const mapScenes: Record<string, Scene> = {
     bg: "loc_spring_water",
     choices: [
       {
-        text: "下路取水背负 (增加负重)",
+        text: "下路取水背负",
         action: "loot_supplies",
         target: "node_xiyuan",
         cost: { hunger: 10, hp: 5 },
@@ -502,12 +502,12 @@ const mapScenes: Record<string, Scene> = {
     bg: "loc_ridge",
     choices: [
       {
-        text: "右转登顶拔仙台 (圆梦)",
+        text: "右转登顶拔仙台",
         target: "node_baxiantai",
         cost: { hunger: 10, hp: 5 },
       },
       {
-        text: "左转直奔大爷海 (省力)",
+        text: "左转直奔大爷海",
         target: "node_daye_lake",
         cost: { hunger: 5 },
       },
@@ -683,37 +683,37 @@ const mapScenes: Record<string, Scene> = {
     id: "end_success",
     text: "顺着游人如织的台阶路下山，你恍如隔世。你满身泥泞，在游客惊讶的目光中走出了大山。你活着，并且战胜了自己。",
     bg: "bg_sunny",
-    choices: [{ text: "铭记此次经历，重新开始", action: "restart" }],
+    choices: [{ text: "徒步结束", action: "restart" }],
   },
   end_retreat: {
     id: "end_retreat",
     text: "【明智之选】山永远在那里，生命只有一次。你做出了艰难但正确的决定——下撤。回望云雾缭绕的主峰，你知道自己还会回来的。",
     bg: "loc_village",
-    choices: [{ text: "结束本次旅程", action: "restart" }],
+    choices: [{ text: "徒步结束", action: "restart" }],
   },
   dead_001: {
     id: "dead_001",
     text: "【长眠大山】你的意识逐渐模糊... 身体不再寒冷，反而感到一丝温暖。在这片无人区，你成为了大山的一部分。",
     bg: "bg_snow",
-    choices: [{ text: "重新开始", action: "restart" }],
+    choices: [{ text: "徒步结束", action: "restart" }],
   },
   dead_starve: {
     id: "dead_starve",
     text: "天色渐晚，雾气开始上涌。你来到了红桦林。枯红的树皮如血般剥落，风吹过发出沙沙的声响。",
     bg: "bg_snow",
-    choices: [{ text: "重新开始", action: "restart" }],
+    choices: [{ text: "徒步结束", action: "restart" }],
   },
   dead_cold: {
     id: "dead_cold",
     text: "【失温】核心体温降低，你开始出现幻觉，感到异常燥热而脱去了衣服... 最后的微笑凝固在嘴角。",
     bg: "bg_storm",
-    choices: [{ text: "重新开始", action: "restart" }],
+    choices: [{ text: "徒步结束", action: "restart" }],
   },
   dead_sanity: {
     id: "dead_sanity",
     text: "【崩溃】无尽的黑暗和风声击垮了你的意志。你开始胡言乱语，冲向了悬崖...",
     bg: "bg_fog",
-    choices: [{ text: "重新开始", action: "restart" }],
+    choices: [{ text: "徒步结束", action: "restart" }],
   },
   end_caught: {
     id: "end_caught",
@@ -725,13 +725,13 @@ const mapScenes: Record<string, Scene> = {
     id: "end_rescue",
     text: "【获救】只有亲历者才知道等待救援的那十几个小时有多绝望。获救了，但“驴友”的名声又多了一笔负面教材。",
     bg: "loc_camp",
-    choices: [{ text: "重新开始", action: "restart" }],
+    choices: [{ text: "徒步结束", action: "restart" }],
   },
   end_lost_23km: {
     id: "end_lost_23km",
     text: "【失踪】你虽然走了直路，却越走越偏。这是著名的“23公里跑道”，一条通往死亡的单行道。没人知道你去了哪里。",
     bg: "bg_fog",
-    choices: [{ text: "重新开始", action: "restart" }],
+    choices: [{ text: "徒步结束", action: "restart" }],
   },
 };
 
@@ -830,6 +830,89 @@ const eventScenes: Record<string, Scene> = {
       { text: "大声驱赶", cost: { hp: 50, sanity: 10 }, target: "resume" },
     ],
   },
+  evt_hallucination_music: {
+    id: "evt_hallucination_music",
+    text: "恍惚中，你听到风中传来了秦腔的吼声，高亢激昂。但这里是海拔3000米的无人区，哪来的戏班子？",
+    bg: "bg_fog",
+    choices: [
+      {
+        text: "停下来仔细听 (可能是幻觉)",
+        cost: { sanity: -10, hunger: 5 },
+        target: "resume",
+      },
+      {
+        text: "掐自己一下，清醒过来",
+        cost: { sanity: 5, hp: 2 },
+        target: "resume",
+      },
+    ],
+  },
+  evt_gear_failure: {
+    id: "evt_gear_failure",
+    text: "突然脚下一软，你发现登山鞋的甚至脱胶了，“张开了大嘴”。这是鳌太路上最令人崩溃的装备故障之一。",
+    bg: "loc_stone_sea",
+    choices: [
+      {
+        text: "用求生绳绑住",
+        action: "rest", // Simulating time cost
+        target: "resume",
+      },
+      {
+        text: "拖着鞋走 (极易崴脚)",
+        cost: { hp: 10, hunger: 10 },
+        target: "resume",
+      },
+    ],
+  },
+  evt_trail_angel: {
+    id: "evt_trail_angel",
+    text: "在路边的大石头下，你发现了一瓶矿泉水，上面写着“水神赐予后来人”。在这缺水的山脊上，这是无价之宝。",
+    bg: "loc_stone_sea",
+    choices: [
+      {
+        text: "感激地喝掉",
+        cost: { hunger: -10, sanity: 5 },
+        target: "resume",
+      },
+      {
+        text: "留给更需要的人",
+        cost: { sanity: 15 }, // Karma boost
+        target: "resume",
+      },
+    ],
+  },
+  evt_lightning: {
+    id: "evt_lightning",
+    text: "头皮突然发麻，头发竖了起来，空气中充满了滋滋的电流声！是这雷击的前兆！",
+    bg: "bg_storm",
+    choices: [
+      {
+        text: "扔掉登山杖，抱头蹲下",
+        target: "resume",
+      },
+      {
+        text: "惊慌失措地狂奔",
+        cost: { hp: 50, sanity: -10 },
+        target: "resume",
+      },
+    ],
+  },
+  evt_wild_boar: {
+    id: "evt_wild_boar",
+    text: "前方的箭竹林里传来巨大的“哗啦”声，似乎有庞然大物在穿行。可能是野猪，也可能是黑熊。",
+    bg: "loc_forest",
+    choices: [
+      {
+        text: "敲击登山杖制造噪音",
+        target: "resume",
+      },
+      {
+        text: "屏住呼吸，悄悄通过",
+        cost: { sanity: -5 },
+        target: "resume",
+      },
+    ],
+  },
 };
 
 export const scenes: Record<string, Scene> = {
@@ -843,4 +926,9 @@ export const randomEventIds = [
   "evt_ranger",
   "evt_body",
   "evt_takin",
+  "evt_hallucination_music",
+  "evt_gear_failure",
+  "evt_trail_angel",
+  "evt_lightning",
+  "evt_wild_boar",
 ];
