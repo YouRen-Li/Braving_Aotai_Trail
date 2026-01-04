@@ -75,13 +75,37 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "加快脚步热身",
-        target: "node_river_crossing",
+        target: "node_village_road_hike_feedback",
         cost: { hunger: 2 },
       },
       {
         text: "检查背包",
-        target: "node_river_crossing",
+        target: "node_village_road_check_feedback",
         cost: { hunger: 1 },
+      },
+    ],
+  },
+
+  node_village_road_hike_feedback: {
+    id: "node_village_road_hike_feedback",
+    text: "你加快了步频，身体逐渐热了起来。虽然只是机耕路，但坡度已经让你微微出汗。你感觉身体慢慢进入了状态。\n(状态反馈：饱食度 -2)",
+    bg: "loc_tractor_road",
+    choices: [
+      {
+        text: "身体活动开了",
+        target: "node_river_crossing",
+      },
+    ],
+  },
+
+  node_village_road_check_feedback: {
+    id: "node_village_road_check_feedback",
+    text: "你停下来仔细检查了背包扣件和鞋带，重新调整了负重系统。虽然耽误了一点时间，但磨刀不误砍柴工，接下来的路会舒服很多。\n(状态反馈：饱食度 -1)",
+    bg: "loc_tractor_road",
+    choices: [
+      {
+        text: "确认无误",
+        target: "node_river_crossing",
       },
     ],
   },
@@ -93,19 +117,55 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "踩着石头跳过去",
-        target: "node_forest_entry",
+        target: "node_river_jump_feedback",
         cost: { hunger: 3, sanity: 2 },
       },
       {
         text: "脱鞋涉水",
-        target: "node_forest_entry",
+        target: "node_river_wade_feedback",
         cost: { hp: 2, hunger: 2 },
       },
       {
         text: "[退伍军人] 搭建简易绳桥通过",
         requiredRole: "veteran",
-        target: "node_forest_entry",
+        target: "node_river_bridge_feedback",
         cost: { hunger: 1 },
+      },
+    ],
+  },
+
+  node_river_jump_feedback: {
+    id: "node_river_jump_feedback",
+    text: "你深吸一口气，在湿滑的乱石间腾挪。脚底打滑的瞬间，心脏猛地一缩，好在核心力量稳住了平衡。虽然没湿鞋，但精神高度紧张。\n(状态反馈：饱食度 -3，理智 -2)",
+    bg: "loc_river",
+    choices: [
+      {
+        text: "心有余悸，继续前行",
+        target: "node_forest_entry",
+      },
+    ],
+  },
+
+  node_river_wade_feedback: {
+    id: "node_river_wade_feedback",
+    text: "冰冷的河水瞬间刺透皮肤，骨头都被冻得生疼。河底的尖石硌得脚板发麻。上岸擦干脚时，你的双脚已经冻得通红。\n(状态反馈：生命值 -2，饱食度 -2)",
+    bg: "loc_river",
+    choices: [
+      {
+        text: "穿好鞋袜，暖和一下",
+        target: "node_forest_entry",
+      },
+    ],
+  },
+
+  node_river_bridge_feedback: {
+    id: "node_river_bridge_feedback",
+    text: "凭借过硬的野外生存技能，你利用枯木和伞绳快速搭建了简易支点。如履平地般通过了河流，仅仅消耗了一点体力。\n(状态反馈：饱食度 -1)",
+    bg: "loc_river",
+    choices: [
+      {
+        text: "收拾装备，轻松上路",
+        target: "node_forest_entry",
       },
     ],
   },
@@ -117,14 +177,38 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "保持节奏爬升",
-        target: "node_forest_climb",
+        target: "node_forest_entry_climb_feedback",
         cost: { hunger: 5, hp: 2 },
       },
       {
         text: "回头看一眼山下的村庄",
         action: "look_back",
-        target: "node_forest_climb",
+        target: "node_forest_entry_look_feedback",
         cost: { hunger: 3, sanity: -5 },
+      },
+    ],
+  },
+
+  node_forest_entry_climb_feedback: {
+    id: "node_forest_entry_climb_feedback",
+    text: "不管路况如何，你始终保持着均匀的呼吸和步幅。机械的重复动作让人感到枯燥，但这是应对长距离爬升最有效的方法。\n(状态反馈：饱食度 -5，生命值 -2)",
+    bg: "loc_red_birch",
+    choices: [
+      {
+        text: "继续爬升",
+        target: "node_forest_climb",
+      },
+    ],
+  },
+
+  node_forest_entry_look_feedback: {
+    id: "node_forest_entry_look_feedback",
+    text: "你停下脚步回头望去，山下的村庄已经变成了火柴盒大小。不知为何，看着那个熟悉的文明世界，心中突然涌起一阵对前路的恐惧。\n(状态反馈：饱食度 -3，理智 -5)",
+    bg: "loc_red_birch",
+    choices: [
+      {
+        text: "转过头，不再留恋",
+        target: "node_forest_climb",
       },
     ],
   },
@@ -134,10 +218,26 @@ const mapScenes: Record<string, Scene> = {
     text: "海拔上升到2600米。树木变得稀疏，空气也变得稀薄。每迈出一步都需要大口喘气。",
     bg: "loc_forest",
     choices: [
-      { text: "咬牙坚持", target: "node_2900", cost: { hunger: 15, hp: 5 } },
+      {
+        text: "咬牙坚持",
+        target: "node_forest_climb_push_feedback",
+        cost: { hunger: 15, hp: 5 },
+      },
       {
         text: "喝口水继续赶路",
         cost: { hp: -5, hunger: -2 },
+        target: "node_2900",
+      },
+    ],
+  },
+
+  node_forest_climb_push_feedback: {
+    id: "node_forest_climb_push_feedback",
+    text: "缺氧让你的脑袋发涨，腿像灌了铅一样沉重。你全凭意志力在抬腿。汗水流进眼睛里，刺痛难忍。\n(状态反馈：饱食度 -15，生命值 -5)",
+    bg: "loc_forest",
+    choices: [
+      {
+        text: "看到营地了",
         target: "node_2900",
       },
     ],
@@ -173,10 +273,38 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "手脚并用攀爬",
-        target: "node_penjing",
+        target: "node_penjing_ascent_climb_feedback",
         cost: { hunger: 20, hp: 5 },
       },
-      { text: "使用登山杖支撑", target: "node_penjing", cost: { hunger: 15 } },
+      {
+        text: "使用登山杖支撑",
+        target: "node_penjing_ascent_stick_feedback",
+        cost: { hunger: 15 },
+      },
+    ],
+  },
+
+  node_penjing_ascent_climb_feedback: {
+    id: "node_penjing_ascent_climb_feedback",
+    text: "你像一只壁虎一样趴在乱石上移动。虽然姿势不雅，但四点着地确实稳当。只是手指被粗糙的岩石磨得生疼。\n(状态反馈：饱食度 -20，生命值 -5)",
+    bg: "loc_stone_sea",
+    choices: [
+      {
+        text: "翻过乱石坡",
+        target: "node_penjing",
+      },
+    ],
+  },
+
+  node_penjing_ascent_stick_feedback: {
+    id: "node_penjing_ascent_stick_feedback",
+    text: "登山杖由于受力过猛而微微弯曲。你把全身重量都压在杖上，减轻了膝盖的负担。这种省力的技巧让你在乱石中游刃有余。\n(状态反馈：饱食度 -15)",
+    bg: "loc_stone_sea",
+    choices: [
+      {
+        text: "拄着杖继续走",
+        target: "node_penjing",
+      },
     ],
   },
 
@@ -187,7 +315,7 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "给家人打电话",
-        target: "node_baiqi_start",
+        target: "node_penjing_call_feedback",
         cost: { sanity: -20 },
       },
       {
@@ -197,8 +325,32 @@ const mapScenes: Record<string, Scene> = {
       },
       {
         text: "继续赶路",
-        target: "node_baiqi_start",
+        target: "node_penjing_hike_feedback",
         cost: { hunger: 15, hp: 5 },
+      },
+    ],
+  },
+
+  node_penjing_call_feedback: {
+    id: "node_penjing_call_feedback",
+    text: "电话接通的那一刻，听到家人的声音，眼泪差点掉下来。你强忍着哽咽报了平安，挂断电话后，心里的石头落地了，但孤独感也随之涌上心头。\n(状态反馈：理智 +20)",
+    bg: "loc_penjing",
+    choices: [
+      {
+        text: "收拾心情，重新出发",
+        target: "node_baiqi_start",
+      },
+    ],
+  },
+
+  node_penjing_hike_feedback: {
+    id: "node_penjing_hike_feedback",
+    text: "你没有停留，咬紧牙关继续赶路。盆景园的路看似平缓，实则暗藏杀机。脚下的乱石不断消耗着你的体能，每一步都需要格外小心。\n(状态反馈：饱食度 -15，生命值 -5)",
+    bg: "loc_penjing",
+    choices: [
+      {
+        text: "调整步伐，继续",
+        target: "node_baiqi_start",
       },
     ],
   },
@@ -211,8 +363,20 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "搜刮物资并返回值路",
         action: "loot_supplies",
-        target: "node_baiqi_start",
+        target: "node_penjing_return_feedback",
         cost: { hunger: 10, hp: 5 },
+      },
+    ],
+  },
+
+  node_penjing_return_feedback: {
+    id: "node_penjing_return_feedback",
+    text: "背包里多了物资，心里踏实了，但身体更累了。从深沟爬回主路的过程简直是噩梦，肺部像拉风箱一样剧烈起伏。\n(状态反馈：饱食度 -10，生命值 -5)",
+    bg: "loc_penjing",
+    choices: [
+      {
+        text: "大口喘气，平复心跳",
+        target: "node_baiqi_start",
       },
     ],
   },
@@ -237,13 +401,37 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "保持节奏前进",
-        target: "node_nav_stand",
+        target: "node_baiqi_pace_feedback",
         cost: { hunger: 5, hp: 2 },
       },
       {
         text: "加速奔向导航架",
-        target: "node_nav_stand",
+        target: "node_baiqi_rush_feedback",
         cost: { hunger: 10, hp: 1 },
+      },
+    ],
+  },
+
+  node_baiqi_pace_feedback: {
+    id: "node_baiqi_pace_feedback",
+    text: "你强压下急躁的心情，调整呼吸配合步伐。虽然慢了一点，但每一步都走得很稳，体能流失在可控范围内。\n(状态反馈：饱食度 -5，生命值 -2)",
+    bg: "loc_ridge",
+    choices: [
+      {
+        text: "稳扎稳打",
+        target: "node_nav_stand",
+      },
+    ],
+  },
+
+  node_baiqi_rush_feedback: {
+    id: "node_baiqi_rush_feedback",
+    text: "看着目标就在眼前，你不知不觉加快了脚步。心跳剧烈加速，汗水很快浸湿了速干衣。虽然快，但这种急行军极其透支体力。\n(状态反馈：饱食度 -10，生命值 -1)",
+    bg: "loc_ridge",
+    choices: [
+      {
+        text: "喘着粗气到达",
+        target: "node_nav_stand",
       },
     ],
   },
@@ -255,13 +443,25 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "向左切，对准蓝旗方向",
-        target: "node_maijie_descent",
+        target: "node_nav_left_feedback",
         cost: { hunger: 5 },
       },
       {
         text: "迷信直觉，直走",
         target: "end_lost_23km",
         cost: { hunger: 20, sanity: 20 },
+      },
+    ],
+  },
+
+  node_nav_left_feedback: {
+    id: "node_nav_left_feedback",
+    text: "你信任了前人的指引，向左切去。虽然路迹模糊，但在草甸中穿行比乱石滩轻松多了。远处的蓝旗在风中猎猎作响，仿佛在为你点赞。\n(状态反馈：饱食度 -5)",
+    bg: "loc_nav_stand",
+    choices: [
+      {
+        text: "向着蓝旗前进",
+        target: "node_maijie_descent",
       },
     ],
   },
@@ -275,13 +475,37 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "沿着羚牛兽道右切",
-        target: "node_knife_ridge",
+        target: "node_maijie_path_feedback",
         cost: { hunger: 5 },
       },
       {
         text: "强行翻越石海",
-        target: "node_knife_ridge",
+        target: "node_maijie_climb_feedback",
         cost: { hunger: 20, hp: 15, sanity: -5 },
+      },
+    ],
+  },
+
+  node_maijie_path_feedback: {
+    id: "node_maijie_path_feedback",
+    text: "你跟随羚牛的足迹，在乱石缝隙中找到了一条相对平缓的兽道。虽然绕了一些路，但避开了最危险的锋利岩石，保存了宝贵的体力。\n(状态反馈：饱食度 -5)",
+    bg: "loc_ridge",
+    choices: [
+      {
+        text: "庆幸选对了路",
+        target: "node_knife_ridge",
+      },
+    ],
+  },
+
+  node_maijie_climb_feedback: {
+    id: "node_maijie_climb_feedback",
+    text: "你选择了直面困难。巨石摇晃，每一步都要手脚并用。锋利的岩石划破了裤腿，恐高感让你在某个瞬间大脑一片空白。\n(状态反馈：饱食度 -20，生命值 -15，理智 -5)",
+    bg: "loc_ridge",
+    choices: [
+      {
+        text: "心惊肉跳地通过",
+        target: "node_knife_ridge",
       },
     ],
   },
@@ -298,8 +522,20 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "长舒一口气，滑下碎石坡",
+        target: "node_knife_descent_feedback",
+        cost: { hunger: 5, sanity: -5 },
+      },
+    ],
+  },
+
+  node_knife_descent_feedback: {
+    id: "node_knife_descent_feedback",
+    text: "你像滑雪一样顺着碎石坡滑下，扬起一片尘土。虽然大腿前侧肌肉酸胀，但这可比上坡痛快多了。终于不用在刀尖上跳舞了。\n(状态反馈：饱食度 -5，理智 +5)",
+    bg: "loc_knife_ridge",
+    choices: [
+      {
+        text: "抵达垭口",
         target: "node_shuiwozi_source",
-        cost: { hunger: 5, sanity: 5 },
       },
     ],
   },
@@ -311,20 +547,56 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "左下切去营地取水",
-        target: "node_shuiwozi_camp",
+        target: "node_shuiwozi_descent_success_feedback",
         cost: { hunger: 5 },
         condition: "shuiwozi_water", // Show if water exists
       },
       {
         text: "左下切去营地",
-        target: "node_shuiwozi_dry",
+        target: "node_shuiwozi_descent_fail_feedback",
         cost: { hunger: 10, sanity: 5 },
         condition: "!shuiwozi_water", // Show if dry
       },
       {
         text: "垭口无水扎营",
-        target: "node_plane_wreck",
+        target: "node_shuiwozi_pass_camp_feedback",
         cost: { hunger: 10, sanity: 10 },
+      },
+    ],
+  },
+
+  node_shuiwozi_descent_success_feedback: {
+    id: "node_shuiwozi_descent_success_feedback",
+    text: "一路下切到沟底，植被逐渐茂密。远远听到潺潺水声，那是生命的声音。你连跑带滑冲向水源。\n(状态反馈：饱食度 -5)",
+    bg: "loc_spring_water",
+    choices: [
+      {
+        text: "扑向水源",
+        target: "node_shuiwozi_camp",
+      },
+    ],
+  },
+
+  node_shuiwozi_descent_fail_feedback: {
+    id: "node_shuiwozi_descent_fail_feedback",
+    text: "沟深路陡，越往下走心里越没底。并没有听到预期的水声，四周死寂沉沉。你的喉咙在那一刻似乎更干了。\n(状态反馈：饱食度 -10，理智 -5)",
+    bg: "loc_spring_water",
+    choices: [
+      {
+        text: "绝望地走到沟底",
+        target: "node_shuiwozi_dry",
+      },
+    ],
+  },
+
+  node_shuiwozi_pass_camp_feedback: {
+    id: "node_shuiwozi_pass_camp_feedback",
+    text: "既然没水，就不折腾下沟了。你在垭口找了块平地，伴着呼啸的风声和极度的口渴，度过了漫长的一夜。梦里全是冰镇可乐。\n(状态反馈：饱食度 -10，理智 -10)",
+    bg: "loc_spring_water",
+    choices: [
+      {
+        text: "拔营起身上路",
+        target: "node_plane_wreck",
       },
     ],
   },
@@ -480,8 +752,20 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "开始漫长的攀爬",
-        target: "node_pyramid",
+        target: "node_pyramid_climb_feedback",
         cost: { hunger: 15 },
+      },
+    ],
+  },
+
+  node_pyramid_climb_feedback: {
+    id: "node_pyramid_climb_feedback",
+    text: "从2800营地拔高，每一步都在挑战心肺极限。随着海拔上升，植被消失，只剩下冰冷的石头。当你站在金字塔顶端时，回望来路，不由得心生敬畏。\n(状态反馈：饱食度 -15)",
+    bg: "loc_stone_sea",
+    choices: [
+      {
+        text: "抵达塔顶",
+        target: "node_pyramid",
       },
     ],
   },
@@ -533,13 +817,37 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "下撤取水背负",
         action: "loot_supplies",
-        target: "node_xiyuan",
+        target: "node_ta3_loot_feedback",
         cost: { hunger: 15, hp: 5 },
       },
       {
         text: "赌西源有水，直接走",
-        target: "node_xiyuan",
+        target: "node_ta3_gamble_feedback",
         cost: { hunger: 5 },
+      },
+    ],
+  },
+
+  node_ta3_loot_feedback: {
+    id: "node_ta3_loot_feedback",
+    text: "为了保险起见，你决定多花力气背水。下西源的路异常陡峭，回来时背着沉重的水袋，每一步都像在举重。但看着满满的水袋，心里踏实了。\n(状态反馈：饱食度 -15，生命值 -5)",
+    bg: "loc_spring_water",
+    choices: [
+      {
+        text: "背着水袋前往营地",
+        target: "node_xiyuan",
+      },
+    ],
+  },
+
+  node_ta3_gamble_feedback: {
+    id: "node_ta3_gamble_feedback",
+    text: "你决定相信运气，或者说相信老天爷。省去了下撤的体力，你轻装快步走向营地，夕阳把你的影子拉得很长。\n(状态反馈：饱食度 -5)",
+    bg: "loc_spring_water",
+    choices: [
+      {
+        text: "忐忑地前往营地",
+        target: "node_xiyuan",
       },
     ],
   },
@@ -602,6 +910,18 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "狂饮河水，扎营",
         action: "rest",
+        target: "node_dashihe_drink_feedback",
+      },
+    ],
+  },
+
+  node_dashihe_drink_feedback: {
+    id: "node_dashihe_drink_feedback",
+    text: "冰冷透骨的河水顺着喉咙流下，五脏六腑都跟着颤抖。这一路的干渴终于得到了缓解。你在河边洗了把脸，感觉活过来了。",
+    bg: "loc_camp",
+    choices: [
+      {
+        text: "钻进帐篷休息",
         target: "node_wanxian",
       },
     ],
@@ -627,13 +947,37 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "右转登顶",
-        target: "node_baxiantai",
+        target: "node_summit_fork_climb_feedback",
         cost: { hunger: 10, hp: 5 },
       },
       {
         text: "直奔大爷海",
-        target: "node_daye_lake",
+        target: "node_summit_fork_skip_feedback",
         cost: { hunger: 5 },
+      },
+    ],
+  },
+
+  node_summit_fork_climb_feedback: {
+    id: "node_summit_fork_climb_feedback",
+    text: "你选择了登顶。虽然已经筋疲力尽，但“来都来了”的念头支撑着你。最后这段路是手脚并用爬上去的。\n(状态反馈：饱食度 -10，生命值 -5)",
+    bg: "loc_ridge",
+    choices: [
+      {
+        text: "终于站上顶峰",
+        target: "node_baxiantai",
+      },
+    ],
+  },
+
+  node_summit_fork_skip_feedback: {
+    id: "node_summit_fork_skip_feedback",
+    text: "你放弃了登顶。看着右侧通往顶峰的路，你摇了摇头。留得青山在，不怕没柴烧。保存体力下山更重要。\n(状态反馈：饱食度 -5)",
+    bg: "loc_ridge",
+    choices: [
+      {
+        text: "前往大爷海",
+        target: "node_daye_lake",
       },
     ],
   },
@@ -663,13 +1007,37 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "奢侈一把，买吃买喝",
-        target: "node_wengong",
+        target: "node_daye_lake_buy_feedback",
         cost: { hunger: -50, sanity: -50 },
       },
       {
         text: "继续赶路",
-        target: "node_wengong",
+        target: "node_daye_lake_skip_feedback",
         cost: { hunger: 5 },
+      },
+    ],
+  },
+
+  node_daye_lake_buy_feedback: {
+    id: "node_daye_lake_buy_feedback",
+    text: "泡面的香气在冰冷的空气中是如此诱人。你大口喝着热汤，感觉每一个细胞都在欢呼。什么都不想了，先吃饱再说。\n(状态反馈：饱食度 +50，理智 +50)",
+    bg: "loc_daye_lake",
+    choices: [
+      {
+        text: "心满意足地上路",
+        target: "node_wengong",
+      },
+    ],
+  },
+
+  node_daye_lake_skip_feedback: {
+    id: "node_daye_lake_skip_feedback",
+    text: "你咽了口唾沫，强行把视线从接待站移开。虽然肚子在抗议，但你知道不能在这里懈怠。一鼓作气，继续下山。\n(状态反馈：饱食度 -5)",
+    bg: "loc_daye_lake",
+    choices: [
+      {
+        text: "毅然离开",
+        target: "node_wengong",
       },
     ],
   },
@@ -685,8 +1053,20 @@ const mapScenes: Record<string, Scene> = {
       },
       {
         text: "走完大鳌太全程",
-        target: "node_fangyang",
+        target: "node_wengong_walk_feedback",
         cost: { hunger: 10 },
+      },
+    ],
+  },
+
+  node_wengong_walk_feedback: {
+    id: "node_wengong_walk_feedback",
+    text: "大多数人在这里就结束了。但你选择了继续。接下来的路是无尽的跑马梁，枯燥、漫长，却是大鳌太的精华所在。\n(状态反馈：饱食度 -10)",
+    bg: "loc_wengong_temple",
+    choices: [
+      {
+        text: "踏上跑马梁",
+        target: "node_fangyang",
       },
     ],
   },
@@ -698,8 +1078,20 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "坚持走下去",
-        target: "node_mingxing",
+        target: "node_fangyang_hike_feedback",
         cost: { hunger: 10, hp: 5 },
+      },
+    ],
+  },
+
+  node_fangyang_hike_feedback: {
+    id: "node_fangyang_hike_feedback",
+    text: "膝盖已经到了极限，每一步都是钻心的疼。你只能用登山杖死死撑住地面，像机器人一样机械地挪动。\n(状态反馈：饱食度 -10，生命值 -5)",
+    bg: "loc_fangyang_temple",
+    choices: [
+      {
+        text: "咬牙前行",
+        target: "node_mingxing",
       },
     ],
   },
