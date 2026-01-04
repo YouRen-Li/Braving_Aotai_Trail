@@ -18,9 +18,9 @@ export interface Scene {
   bg?: string;
 }
 
-// --- 真实地图节点扩充版 (40+ Nodes) ---
+// --- 真实地图节点扩充版 ---
 const mapScenes: Record<string, Scene> = {
-  // === 第一章：进山 (The Approach) ===
+  // === 第一章：进山 ===
 
   start_001: {
     id: "start_001",
@@ -29,7 +29,7 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       { text: "整理心情，踏上机耕路", target: "node_village_road" },
       {
-        text: "先在村口吃顿饱饭 (饱食+10)",
+        text: "先在村口吃顿饱饭",
         cost: { hunger: -10 },
         target: "node_village_road",
       },
@@ -47,7 +47,7 @@ const mapScenes: Record<string, Scene> = {
         cost: { hunger: 5 },
       },
       {
-        text: "调整背包背负系统",
+        text: "检查背包",
         target: "node_river_crossing",
         cost: { hunger: 2 },
       },
@@ -65,7 +65,7 @@ const mapScenes: Record<string, Scene> = {
         cost: { hunger: 5, sanity: 2 },
       },
       {
-        text: "脱鞋涉水 (失温风险)",
+        text: "脱鞋涉水",
         target: "node_forest_entry",
         cost: { hp: 5, hunger: 5 },
       },
@@ -83,7 +83,7 @@ const mapScenes: Record<string, Scene> = {
         cost: { hunger: 10, hp: 2 },
       },
       {
-        text: "回头看一眼山下的村庄 (理智+5)",
+        text: "回头看一眼山下的村庄",
         action: "look_back",
         target: "node_forest_climb",
         cost: { hunger: 5, sanity: -5 },
@@ -127,7 +127,7 @@ const mapScenes: Record<string, Scene> = {
     choices: [{ text: "拔营前往盆景园", target: "node_penjing_ascent" }],
   },
 
-  // === 第二章：脊线之上 (On the Ridge) ===
+  // === 第二章：脊线之上  ===
 
   node_penjing_ascent: {
     id: "node_penjing_ascent",
@@ -150,7 +150,7 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       { text: "穿过怪树林", target: "node_baiqi_start", cost: { hunger: 10 } },
       {
-        text: "拍照留念 (理智+5)",
+        text: "拍照留念",
         target: "node_baiqi_start",
         cost: { hunger: 10, sanity: -5 },
       },
@@ -204,14 +204,14 @@ const mapScenes: Record<string, Scene> = {
         cost: { hunger: 10, hp: 2 },
       },
       {
-        text: "在架子下躲避风雪 (恢复体力)",
+        text: "在架子下躲避风雪",
         cost: { hp: -10, hunger: 10, sanity: -5 },
         target: "node_maijie_descent",
       },
     ],
   },
 
-  // === 第三章：凶险之间 (The Danger Zone) ===
+  // === 第三章：凶险之间  ===
 
   node_maijie_descent: {
     id: "node_maijie_descent",
@@ -224,7 +224,7 @@ const mapScenes: Record<string, Scene> = {
         cost: { hunger: 15, hp: 5 },
       },
       {
-        text: "屁降 (坐着滑下去)",
+        text: "屁降",
         target: "node_knife_ridge",
         cost: { hunger: 10, hp: 10 },
       },
@@ -285,7 +285,7 @@ const mapScenes: Record<string, Scene> = {
     choices: [{ text: "出发，穿越飞机梁", target: "node_plane_wreck" }],
   },
 
-  // === 第四章：迷途 (Lost) ===
+  // === 第四章：迷途 ===
 
   node_plane_wreck: {
     id: "node_plane_wreck",
@@ -365,7 +365,7 @@ const mapScenes: Record<string, Scene> = {
     ],
   },
 
-  // === 第五章：朝圣 (Pilgrimage) ===
+  // === 第五章：朝圣  ===
 
   node_pyramid: {
     id: "node_pyramid",
@@ -529,7 +529,7 @@ const eventScenes: Record<string, Scene> = {
         cost: { hunger: 40, sanity: 5 },
         target: "resume",
       },
-      { text: "尝试用卫星电话求救 (需要信号)", action: "sos" },
+      { text: "尝试用卫星电话求救", action: "sos" },
     ],
   },
 
@@ -557,7 +557,7 @@ const eventScenes: Record<string, Scene> = {
     text: "在一块巨石的缝隙中，你发现了一具蜷缩的遗体。他衣着单薄，似乎生前有“反常脱衣”现象。这残酷的一幕让你不寒而栗。",
     bg: "loc_stone_sea",
     choices: [
-      { text: "搜寻遗物 (理智-20)", action: "loot_supplies", target: "resume" },
+      { text: "搜寻遗物", action: "loot_supplies", target: "resume" },
       { text: "默哀并离开", cost: { hunger: 5, sanity: 10 }, target: "resume" },
     ],
   },

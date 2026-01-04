@@ -20,7 +20,7 @@
             </view>
 
             <button class="restart-btn" hover-class="btn-hover" @click="onRestart">
-                再次挑战
+                返回主页
             </button>
         </view>
     </view>
@@ -57,9 +57,7 @@ const rank = computed(() => {
 });
 
 const onRestart = () => {
-    // Reset game and stay on this page, or go back to home?
-    // Let's re-init.
-    gameStore.initGame();
+    uni.reLaunch({ url: '/pages/index/index' });
 };
 </script>
 
