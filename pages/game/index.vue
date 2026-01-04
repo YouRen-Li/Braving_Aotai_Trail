@@ -1,5 +1,11 @@
 <template>
   <view class="game-container">
+    <!-- 动态背景层 -->
+    <background-layer />
+
+    <!-- 伤害血红特效 -->
+    <view class="damage-flash" :class="{ active: showDamageFlash }"></view>
+
     <!-- 状态栏 -->
     <game-status />
 
@@ -40,11 +46,13 @@ import GameStatus from './components/GameStatus.vue';
 import BagButton from './components/BagButton.vue';
 import InventoryPanel from './components/InventoryPanel.vue';
 import GameOverPanel from './components/GameOverPanel.vue';
+import BackgroundLayer from './components/BackgroundLayer.vue';
 import { useTypewriter } from '@/utils/composables/useTypewriter';
 
 const gameStore = useGameStore();
 const currentScene = computed(() => gameStore.currentScene);
 const showInventory = ref(false);
+const showDamageFlash = ref(false);
 
 // 打字机特效
 const { displayedText, isTyping, start, skip } = useTypewriter();
@@ -53,6 +61,16 @@ const { displayedText, isTyping, start, skip } = useTypewriter();
 watch(() => currentScene.value.id, (newId) => {
   start(currentScene.value.text);
 }, { immediate: true });
+
+// 监听HP变化，触发受伤特效
+watch(() => gameStore.status.hp, (newHp, oldHp) => {
+  if (newHp < oldHp) {
+    showDamageFlash.value = true;
+    setTimeout(() => {
+      showDamageFlash.value = false;
+    }, 300);
+  }
+});
 
 const handleTextClick = () => {
   if (isTyping.value) {
@@ -77,10 +95,28 @@ const formatCost = (cost) => {
 .game-container {
   width: 100%;
   height: 100vh;
-  background: #1a1a1a;
+  position: relative;
   display: flex;
   flex-direction: column;
   color: #fff;
+  overflow: hidden;
+}
+
+.damage-flash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, transparent 50%, rgba(255, 0, 0, 0.6) 100%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s;
+  z-index: 10;
+
+  &.active {
+    opacity: 1;
+  }
 }
 
 .story-area {

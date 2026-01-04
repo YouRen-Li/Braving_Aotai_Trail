@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import {
   scenes,
+  randomEventIds, // Import the list
   type SceneChoice,
   type ChoiceCost,
   type Scene,
@@ -14,6 +15,7 @@ declare const uni: any;
 interface GameState {
   gameState: "idle" | "playing" | "ended";
   currentSceneId: string;
+  nextSceneId: string; // To remember where we were going before event
   player: {
     name: string;
     identity: string;
@@ -35,6 +37,7 @@ export const useGameStore = defineStore("game", {
     // 基础状态
     gameState: "idle",
     currentSceneId: "start_001",
+    nextSceneId: "",
 
     // 玩家状态
     player: {
@@ -73,6 +76,7 @@ export const useGameStore = defineStore("game", {
     initGame() {
       this.gameState = "playing";
       this.currentSceneId = "start_001";
+      this.nextSceneId = "";
       this.status = { hp: 100, hunger: 100, maxHp: 100, maxHunger: 100 };
       this.player.days = 1;
       this.inventory = [];
@@ -83,6 +87,7 @@ export const useGameStore = defineStore("game", {
       this.gainItem("water_001");
       this.gainItem("food_001");
 
+      this.saveGame();
       console.log("Game Initialized");
     },
 
@@ -123,6 +128,7 @@ export const useGameStore = defineStore("game", {
 
         // 移除消耗品
         this.inventory.splice(index, 1);
+        this.saveGame(); // Save on use item
       } else {
         uni.showToast({ title: "暂时无法使用该物品", icon: "none" });
       }
@@ -154,12 +160,6 @@ export const useGameStore = defineStore("game", {
         this.applyCost(choice.cost);
       }
 
-      // 变天逻辑：每次移动都有概率变天
-      // 可以在这里简单处理，或者单独的 action
-      if (choice.target) {
-        this.randomizeWeather();
-      }
-
       // 执行特殊动作
       if (choice.action) {
         this.handleAction(choice.action);
@@ -170,10 +170,43 @@ export const useGameStore = defineStore("game", {
         return;
       }
 
-      // 场景跳转
+      // 场景跳转逻辑
       if (choice.target) {
-        // 恶劣天气可能导致无法前往特定区域 (暂未实现，可扩展)
-        this.moveToScene(choice.target);
+        // Resume logic: go to stored nextScene
+        if (choice.target === "resume") {
+          if (this.nextSceneId) {
+            this.moveToScene(this.nextSceneId);
+            this.nextSceneId = ""; // Consume it
+          } else {
+            console.error("No nextSceneId to resume to!");
+          }
+          return;
+        }
+
+        // Random Event Trigger Logic
+        // Only trigger events if we are moving to a new node (not an event or special end)
+        // Simple check: does the target start with 'node_'?
+        if (choice.target.startsWith("node_") && Math.random() < 0.3) {
+          // 30% chance to trigger event
+          this.nextSceneId = choice.target; // Store original destination
+          const eventId =
+            randomEventIds[Math.floor(Math.random() * randomEventIds.length)];
+
+          // Special case: Storm event should override weather
+          if (eventId === "evt_storm") {
+            this.weather = "storm";
+          }
+
+          this.moveToScene(eventId);
+          uni.showToast({ title: "遭遇突发事件！", icon: "none" });
+        } else {
+          // Normal move
+          // Change weather when moving normally
+          if (choice.target.startsWith("node_")) {
+            this.randomizeWeather();
+          }
+          this.moveToScene(choice.target);
+        }
       }
     },
 
@@ -219,6 +252,12 @@ export const useGameStore = defineStore("game", {
           this.player.days += 1;
           this.randomizeWeather(); // 睡一觉天气肯定变
           uni.showToast({ title: `休息一晚 (恢复+${heal})`, icon: "none" });
+          this.saveGame();
+          break;
+        case "loot_supplies":
+          this.gainItem("food_001");
+          this.gainItem("water_001");
+          uni.showToast({ title: "找到了一些物资", icon: "none" });
           break;
         case "check_gear":
           uni.showToast({ title: "请打开右上角背包查看", icon: "none" });
@@ -232,7 +271,7 @@ export const useGameStore = defineStore("game", {
     moveToScene(sceneId: string) {
       if (scenes[sceneId]) {
         this.currentSceneId = sceneId;
-        this.saveGame(); // Auto save on scene change
+        this.saveGame(); // Auto save
       } else {
         console.error(`Scene not found: ${sceneId}`);
       }
@@ -250,8 +289,6 @@ export const useGameStore = defineStore("game", {
     // 死亡处理
     die(reason: string) {
       this.gameState = "ended";
-      // Do not use move to scene here to prevent auto-save overwriting "alive" state?
-      // Actually we want to save the death state so user can't just refresh to revive.
       this.currentSceneId = "dead_001";
       this.history.push(`死因: ${reason}`);
       this.saveGame();
@@ -265,6 +302,7 @@ export const useGameStore = defineStore("game", {
         const dataToSave = {
           gameState: this.gameState,
           currentSceneId: this.currentSceneId,
+          nextSceneId: this.nextSceneId,
           player: this.player,
           status: this.status,
           inventory: this.inventory,
@@ -272,7 +310,6 @@ export const useGameStore = defineStore("game", {
           history: this.history,
         };
         uni.setStorageSync("braving_aotai_save_v1", dataToSave);
-        // console.log('Game Saved');
       } catch (e) {
         console.error("Save failed", e);
       }
@@ -284,6 +321,7 @@ export const useGameStore = defineStore("game", {
         if (saved && saved.currentSceneId) {
           this.gameState = saved.gameState;
           this.currentSceneId = saved.currentSceneId;
+          this.nextSceneId = saved.nextSceneId || "";
           this.player = saved.player;
           this.status = saved.status;
           this.inventory = saved.inventory || [];
