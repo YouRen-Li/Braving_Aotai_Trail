@@ -163,54 +163,49 @@ const mapScenes: Record<string, Scene> = {
 
   node_baiqi_start: {
     id: "node_baiqi_start",
-    text: "树木消失了，眼前是裸露的山脊线。风声仿佛千军万马在呼啸，“白起梁”因此得名。体感温度骤降。",
+    text: "经过白起庙。线路从北往南折而向东。草甸上路径明显，一条道通往导航架。虽然要翻越石海，但这片石海经过亿万年沉淀，非常稳固。",
     bg: "loc_ridge",
     choices: [
       {
-        text: "拉紧冲锋衣拉链",
+        text: "轻松翻越石海",
         target: "node_baiqi_middle",
         cost: { hunger: 5 },
-      },
-      {
-        text: "含一颗糖补充热量",
-        target: "node_baiqi_middle",
-        cost: { hunger: -5 },
       },
     ],
   },
 
   node_baiqi_middle: {
     id: "node_baiqi_middle",
-    text: "风像刀子一样割在脸上。两侧是万丈深渊，稍有不慎就会坠落。必须全神贯注。这种单调的行走最容易消磨意志。",
+    text: "翻过这片石海，远方的导航架在向你招手了。这种单调的行走最容易消磨意志。",
     bg: "loc_ridge",
     choices: [
       {
-        text: "机械地迈步",
+        text: "保持节奏前进",
         target: "node_nav_stand",
-        cost: { hunger: 20, sanity: 5 },
+        cost: { hunger: 5, hp: 2 },
       },
       {
-        text: "大吼一声给自己壮胆",
+        text: "加速奔向导航架",
         target: "node_nav_stand",
-        cost: { hunger: 25, sanity: -10 },
+        cost: { hunger: 10, hp: 1 },
       },
     ],
   },
 
   node_nav_stand: {
     id: "node_nav_stand",
-    text: "海拔3475米。这架废弃的导航架是鳌山的标志。风太大了，你甚至无法站稳。",
-    bg: "loc_nav_stand", // Updated
+    text: "鳌山导航架位居路径右侧。切记：直走是往23公里下山的错误死路！对着左前方那面蓝色旗子走，途径药王庙（供奉孙思邈），才是正路。",
+    bg: "loc_nav_stand",
     choices: [
       {
-        text: "快速拍照后离开",
+        text: "向左切，对准蓝旗方向",
         target: "node_maijie_descent",
-        cost: { hunger: 10, hp: 2 },
+        cost: { hunger: 5 },
       },
       {
-        text: "在架子下躲避风雪",
-        cost: { hp: -10, hunger: 10, sanity: -5 },
-        target: "node_maijie_descent",
+        text: "迷信直觉，直走 (错误)",
+        target: "end_lost_23km", // New dead end? Or just punishment
+        cost: { hunger: 20, sanity: -20 },
       },
     ],
   },
@@ -219,72 +214,73 @@ const mapScenes: Record<string, Scene> = {
 
   node_maijie_descent: {
     id: "node_maijie_descent",
-    text: "过了鳌山，路况突变。前方是陡峭的麦秸岭，你需要从这满是碎石的陡坡上下去。",
+    text: "经过两座巨石阵，前方就是麦秸岭。远看险恶石海陈列，近看右侧有兽道。这是第一道“拦路虎”。",
     bg: "loc_ridge",
     choices: [
       {
-        text: "侧身慢下",
+        text: "沿着羚牛兽道右切",
         target: "node_knife_ridge",
-        cost: { hunger: 15, hp: 5 },
+        cost: { hunger: 5 },
       },
       {
-        text: "屁降",
+        text: "强行翻越石海",
         target: "node_knife_ridge",
-        cost: { hunger: 10, hp: 10 },
+        cost: { hunger: 20, hp: 15, sanity: -5 },
       },
     ],
   },
 
   node_knife_ridge: {
     id: "node_knife_ridge",
-    text: "路如其名，山脊窄得只能容下一只脚。两边都是深不见底的悬崖。一阵横风吹来，你晃了一下。",
+    text: "小心通过了刀刃梁。当你看到挂在石头上的“胸罩”标记时，意味着麦秸岭最危险的路段已经结束了。前方是一路下坡。",
     bg: "loc_knife_ridge",
     choices: [
       {
-        text: "趴下爬过去",
+        text: "长舒一口气，滑下碎石坡",
         target: "node_shuiwozi_source",
-        cost: { hunger: 20, sanity: 10 },
-      },
-      {
-        text: "深呼吸，快速通过",
-        target: "node_shuiwozi_source",
-        cost: { hunger: 15, sanity: 5 },
+        cost: { hunger: 5, sanity: 5 }, // Sanity restore
       },
     ],
   },
 
   node_shuiwozi_source: {
     id: "node_shuiwozi_source",
-    text: "翻过刀刃梁，你听到了流水声。在乱石堆下方，有一股细小的清泉。这是救命水。",
+    text: "下到底就是水窝子垭口。这片大草地适合扎营但没水。直走上飞机梁，左侧下沟则是水窝子营地（最佳水源）。",
     bg: "loc_spring_water",
     choices: [
       {
-        text: "把水壶灌满",
-        action: "loot_supplies",
+        text: "左下切去营地取水",
         target: "node_shuiwozi_camp",
+        cost: { hunger: 5 },
       },
-      { text: "顾不上水了，先去营地", target: "node_shuiwozi_camp" },
+      {
+        text: "垭口无水扎营 (需自带水)",
+        target: "node_plane_wreck", // Implies a harder start next day or skipping water
+        cost: { hunger: 10, sanity: -5 },
+      },
     ],
   },
 
   node_shuiwozi_camp: {
     id: "node_shuiwozi_camp",
-    text: "这里是一个相对避风的鞍部。许多队伍会选择在这里扎营。地上有些前人留下的气罐垃圾。",
+    text: "下午14:20，到达水窝子营地。左下方有巨大的水源。如果在营地扎营，明天有小路可直上飞机梁，不必折返爬坡。",
     bg: "loc_camp",
     choices: [
-      { text: "扎营休整", action: "rest", target: "node_shuiwozi_morning" },
       {
-        text: "状态还行，继续",
-        target: "node_plane_wreck",
-        cost: { hunger: 10 },
+        text: "扎营休整 (左下取水)",
+        action: "rest",
+        target: "node_shuiwozi_morning",
       },
-      { text: "感到极限，决定下撤", target: "end_retreat" },
+      {
+        text: "感到极限，决定下撤",
+        target: "end_retreat",
+      },
     ],
   },
 
   node_shuiwozi_morning: {
     id: "node_shuiwozi_morning",
-    text: "这片鞍部在早晨显得格外宁静。远处的云海在翻腾。你收拾好垃圾，准备迎接最艰难的路段。",
+    text: "清晨的云海翻腾。收拾好装备，沿着营地旁的小路直接切上飞机梁。今天是过梁的一天。",
     bg: "loc_camp",
     choices: [{ text: "出发，穿越飞机梁", target: "node_plane_wreck" }],
   },
@@ -293,47 +289,78 @@ const mapScenes: Record<string, Scene> = {
 
   node_plane_wreck: {
     id: "node_plane_wreck",
-    text: "你看到了一些散落的金属碎片，那是多年前坠毁的战机残骸。这里常年大雾，仿佛是被诅咒之地。",
-    bg: "loc_plane_wreck", // Updated
+    text: "爬上飞机梁，你看到了一些战机残骸。接下来要连续过梁：梁1、梁2、梁3。这是挑战心理的一段路。",
+    bg: "loc_plane_wreck",
     choices: [
-      { text: "查看残骸", target: "node_stone_sea", cost: { sanity: 5 } },
+      { text: "查看残骸", target: "node_liang1", cost: { sanity: 5 } },
+      { text: "不看，直接前往梁1", target: "node_liang1" },
+    ],
+  },
+
+  node_liang1: {
+    id: "node_liang1",
+    text: "【梁1】左切。遇到一个一人高的台阶，踏脚处仅有四五十厘米，左边就是悬崖。这对于重装驴友是极大的心理考验。",
+    bg: "loc_stone_sea",
+    choices: [
       {
-        text: "双手合十，匆匆通过",
-        target: "node_stone_sea",
-        cost: { sanity: -2 },
+        text: "克服恐惧，小心攀登",
+        target: "node_liang2",
+        cost: { hunger: 10, sanity: -5 },
+      },
+      {
+        text: "腿软，在同伴/意念帮助下通过",
+        target: "node_liang2",
+        cost: { hunger: 10, sanity: -10 },
       },
     ],
   },
 
-  node_stone_sea: {
-    id: "node_stone_sea",
-    text: "眼前是没有尽头的乱石堆。每块石头都有半人高，且松动不稳。一旦卡住脚就是骨折。",
+  node_liang2: {
+    id: "node_liang2",
+    text: "【梁2】岔路口。左切是先下一个2米深的陡坡滑下去，再拔高；右切则是横穿一片稳固的石海。两条路殊途同归。",
     bg: "loc_stone_sea",
     choices: [
       {
-        text: "像岩羊一样跳跃",
-        target: "node_2800",
-        cost: { hunger: 30, hp: 15 },
+        text: "右切走石海 (推荐，较快)",
+        target: "node_liang3",
+        cost: { hunger: 10 },
       },
       {
-        text: "一步一步试探",
+        text: "左切滑下陡坡 (较慢)",
+        target: "node_liang3",
+        cost: { hunger: 15, hp: 5 },
+      },
+    ],
+  },
+
+  node_liang3: {
+    id: "node_liang3",
+    text: "【梁3】继续右切。连过三梁，体能消耗巨大。前方就是今天的营地了。",
+    bg: "loc_stone_sea",
+    choices: [
+      {
+        text: "坚持走到营地",
         target: "node_2800",
-        cost: { hunger: 40, hp: 5 },
+        cost: { hunger: 10 },
       },
     ],
   },
 
   node_2800: {
     id: "node_2800",
-    text: "海拔重新降到2800米。这里树木茂密，光线阴暗。压抑的氛围让你只想尽快离开。",
+    text: "下午15:00，到达2800营地。这里是鳌山和太白山的分界线。树木茂密，光线阴暗，氛围略显压抑。",
     bg: "loc_forest",
     choices: [
       {
-        text: "进入前面的森林",
+        text: "扎营 (恢复体力)",
+        action: "rest",
         target: "node_fog_entry",
-        cost: { hunger: 10 },
       },
-      { text: "搜索一下周围", target: "evt_tent", cost: { sanity: 5 } },
+      {
+        text: "连夜赶路 (极度危险)",
+        target: "node_fog_entry",
+        cost: { sanity: -50 },
+      },
     ],
   },
 
@@ -475,7 +502,7 @@ const mapScenes: Record<string, Scene> = {
   },
   end_caught: {
     id: "end_caught",
-    text: "【被捕】你被巡山队带回了派出所。写下保证书，缴纳罚款，并被列入黑名单。这一趟“非法穿越”终究以闹剧收场。",
+    text: "【被捕】你被巡山队带回了派出所。写下保证书，缴纳罚款3000元，并被列入黑名单。这一趟“非法穿越”终究以闹剧收场。",
     bg: "loc_village", // Updated
     choices: [{ text: "徒步结束", action: "restart" }],
   },
