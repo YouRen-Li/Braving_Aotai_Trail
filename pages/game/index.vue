@@ -66,7 +66,7 @@ import BackgroundLayer from './components/BackgroundLayer.vue';
 import DayNightOverlay from './components/DayNightOverlay.vue';
 import GameNotification from './components/GameNotification.vue'; // [NEW]
 import { useTypewriter } from '@/utils/composables/useTypewriter';
-import { getCorruptedText } from '@/utils/game/sanity_utils';
+import { getCorruptedText } from '@/utils/game/utils/sanity_utils';
 
 const gameStore = useGameStore();
 
@@ -180,7 +180,10 @@ const handleTextClick = () => {
 };
 
 const onChoose = (choice) => {
-  if (isTyping.value) return; // 打字时不让点选项
+  if (isTyping.value) {
+    skip(); // Click during typing -> Skip text
+    return;
+  }
   gameStore.handleChoice(choice);
 };
 
@@ -325,8 +328,8 @@ page {
   z-index: 30; // Above overlay so we can still click
 
   &.disabled {
-    opacity: 0.5;
-    pointer-events: none;
+    opacity: 0.8; // Changed from 0.5 to indicate it's active but busy
+    // pointer-events: none; // REMOVED: Allow clicking to skip
   }
 }
 

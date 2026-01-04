@@ -98,8 +98,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { roles } from '@/utils/game/roles_data';
-import { items } from '@/utils/game/items_data';
+import { roles } from '@/utils/game/data/roles_data';
+import { items } from '@/utils/game/data/items_data';
 import { useGameStore } from '@/stores/modules/game';
 
 const gameStore = useGameStore();

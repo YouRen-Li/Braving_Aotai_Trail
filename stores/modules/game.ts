@@ -6,11 +6,11 @@ import {
   type ChoiceCost,
   type Scene,
 } from "@/utils/game/scenes_data";
-import { items, type Item, type ItemStats } from "@/utils/game/items_data";
-import { weatherData, type WeatherType } from "@/utils/game/weather_data";
-import { audioManager } from "@/utils/game/audio_manager";
+import { items, type Item, type ItemStats } from "@/utils/game/data/items_data";
+import { weatherData, type WeatherType } from "@/utils/game/data/weather_data";
+import { audioManager } from "@/utils/game/utils/audio_manager";
 import { useMetaStore } from "@/stores/modules/meta";
-import { roles, type Role } from "@/utils/game/roles_data"; // [NEW]
+import { roles, type Role } from "@/utils/game/data/roles_data"; // [NEW]
 
 declare const uni: any;
 

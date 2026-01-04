@@ -1,4 +1,4 @@
-import { type Item } from "@/utils/game/items_data";
+import { type Item } from "./items_data";
 
 export interface Role {
   id: string;

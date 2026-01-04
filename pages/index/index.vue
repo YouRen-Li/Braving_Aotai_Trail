@@ -91,7 +91,7 @@
 import { ref, onMounted } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { useGameStore } from '@/stores/modules/game';
-import { audioManager } from '@/utils/game/audio_manager'; // [NEW]
+import { audioManager } from '@/utils/game/utils/audio_manager'; // [NEW]
 
 const gameStore = useGameStore();
 const hasSave = ref(false);
