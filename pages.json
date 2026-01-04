@@ -12,6 +12,13 @@
       "style": {
         "navigationBarTitleText": "首页"
       }
+    },
+    {
+      "path": "pages/game/index",
+      "style": {
+        "navigationBarTitleText": "勇闯鳌太",
+        "navigationStyle": "custom"
+      }
     }
   ],
   "globalStyle": {

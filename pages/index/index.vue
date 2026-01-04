@@ -68,8 +68,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useGameStore } from '@/stores/modules/game'
 
 const snowflakes = ref([])
+const gameStore = useGameStore()
 
 onMounted(() => {
   // 生成少量的雪花，营造淡淡的氛围
@@ -88,18 +90,24 @@ onMounted(() => {
 
 // 开始徒步
 const handleStartHike = () => {
-  uni.showToast({
-    title: '开始新的徒步之旅',
-    icon: 'none'
+  gameStore.initGame()
+  uni.navigateTo({
+    url: '/pages/game/index'
   })
 }
 
 // 继续徒步
 const handleContinueHike = () => {
-  uni.showToast({
-    title: '继续上次的旅程',
-    icon: 'none'
-  })
+  if (gameStore.gameState !== 'idle') {
+      uni.navigateTo({
+        url: '/pages/game/index'
+      })
+  } else {
+      uni.showToast({
+        title: '暂无存档',
+        icon: 'none'
+      })
+  }
 }
 
 // 关于游戏
