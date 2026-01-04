@@ -563,12 +563,12 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "寻找树上的红布条",
-        target: "node_pyramid_ascent",
+        target: "node_xitaibai",
         cost: { hunger: 20, sanity: -10 }, // Relief
       },
       {
         text: "冷静下来，观察兽道",
-        target: "node_pyramid_ascent",
+        target: "node_xitaibai",
         cost: { hunger: 15, sanity: -5 }, // Calm/Relief
       },
     ],
@@ -858,7 +858,7 @@ const eventScenes: Record<string, Scene> = {
   },
   evt_takin: {
     id: "evt_takin",
-    text: "一头体型硕大的秦岭羚牛挡在了由独木桥上。它盯着你，鼻孔喷着白气。这种独行公牛极具攻击性。",
+    text: "一头体型硕大的秦岭羚牛挡在了独木桥上。它盯着你，鼻孔喷着白气。这种独行公牛极具攻击性。",
     bg: "evt_takin_beast",
     choices: [
       {
@@ -888,7 +888,7 @@ const eventScenes: Record<string, Scene> = {
   },
   evt_gear_failure: {
     id: "evt_gear_failure",
-    text: "突然脚下一软，你发现登山鞋的甚至脱胶了，“张开了大嘴”。这是鳌太路上最令人崩溃的装备故障之一。",
+    text: "突然脚下一软，你发现登山鞋的鞋底甚至脱胶了，“张开了大嘴”。这是鳌太路上最令人崩溃的装备故障之一。",
     bg: "evt_broken_shoe",
     choices: [
       {
@@ -960,6 +960,7 @@ export const scenes: Record<string, Scene> = {
 };
 
 export const randomEventIds = [
+  "evt_tent",
   "evt_hiker",
   "evt_storm",
   "evt_ranger",
