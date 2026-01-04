@@ -137,7 +137,7 @@ const mapScenes: Record<string, Scene> = {
       { text: "咬牙坚持", target: "node_2900", cost: { hunger: 15, hp: 5 } },
       {
         text: "喝口水继续赶路",
-        cost: { hp: -5, hunger: 5 },
+        cost: { hp: -5, hunger: -2 },
         target: "node_2900",
       },
     ],
@@ -324,7 +324,7 @@ const mapScenes: Record<string, Scene> = {
       {
         text: "垭口无水扎营",
         target: "node_plane_wreck",
-        cost: { hunger: 10, sanity: -5 },
+        cost: { hunger: 10, sanity: 10 },
       },
     ],
   },
@@ -973,12 +973,12 @@ const eventScenes: Record<string, Scene> = {
     choices: [
       {
         text: "感激地喝掉",
-        cost: { hunger: -10, sanity: 5 },
+        cost: { hunger: -10, sanity: -5 },
         target: "resume",
       },
       {
         text: "留给更需要的人",
-        cost: { sanity: 15 }, // Karma boost
+        cost: { sanity: -15 }, // Karma boost
         target: "resume",
       },
     ],
