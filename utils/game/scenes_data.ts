@@ -25,7 +25,7 @@ const mapScenes: Record<string, Scene> = {
   start_001: {
     id: "start_001",
     text: "这里是塘口，鳌太线的起点。清晨的空气冷冽刺骨。眼前是连绵的秦岭山脉，墨绿色的冷杉林在风中低语。这一去，便是数日的无人区。",
-    bg: "loc_village", // Updated
+    bg: "loc_village",
     choices: [
       { text: "整理心情，踏上机耕路", target: "node_village_road" },
       {
@@ -75,7 +75,7 @@ const mapScenes: Record<string, Scene> = {
   node_forest_entry: {
     id: "node_forest_entry",
     text: "【红桦林】你正式进入了爬升路段。四周是茂密的红桦林，坡度陡然提升。呼吸开始变得急促，心跳声在耳边回响。",
-    bg: "loc_forest",
+    bg: "loc_red_birch",
     choices: [
       {
         text: "保持节奏爬升",
@@ -104,7 +104,7 @@ const mapScenes: Record<string, Scene> = {
   node_2900: {
     id: "node_2900",
     text: "【2900营地】终于，你到达了第一晚的落脚点。这里地势相对平坦，是一片开阔的草甸。夕阳下的秦岭美得令人窒息。",
-    bg: "loc_camp",
+    bg: "loc_sunset_meadow",
     choices: [
       { text: "搭帐篷过夜", action: "rest" },
       {
@@ -135,7 +135,7 @@ const mapScenes: Record<string, Scene> = {
   node_penjing: {
     id: "node_penjing",
     text: "【盆景园】海拔3100米。这里的太白红杉因长期受大风吹袭，树冠平整如削，姿态奇异，如同天然盆景园。",
-    bg: "loc_stone_sea",
+    bg: "loc_penjing",
     choices: [
       { text: "穿过怪树林", target: "node_baiqi_start", cost: { hunger: 10 } },
       {
@@ -219,7 +219,7 @@ const mapScenes: Record<string, Scene> = {
   node_knife_ridge: {
     id: "node_knife_ridge",
     text: "【刀刃梁】路如其名，山脊窄得只能容下一只脚。两边都是深不见底的悬崖。一阵横风吹来，你晃了一下。",
-    bg: "loc_ridge",
+    bg: "loc_knife_ridge",
     choices: [
       {
         text: "趴下爬过去",
@@ -237,7 +237,7 @@ const mapScenes: Record<string, Scene> = {
   node_shuiwozi_source: {
     id: "node_shuiwozi_source",
     text: "【寻找水源】翻过刀刃梁，你听到了流水声。在乱石堆下方，有一股细小的清泉。这是救命水。",
-    bg: "loc_camp",
+    bg: "loc_spring_water",
     choices: [
       {
         text: "把水壶灌满",
@@ -375,7 +375,7 @@ const mapScenes: Record<string, Scene> = {
   node_daye_lake: {
     id: "node_daye_lake",
     text: "【大爷海】翻过最后一个垭口，那抹幽蓝的湖水出现在眼前。海拔3590米的圣湖。许多人到了这里，都会忍不住落泪。",
-    bg: "loc_lake",
+    bg: "loc_daye_lake",
     choices: [
       { text: "在湖边洗把脸", action: "rest", target: "node_baxian_ascent" },
       {
