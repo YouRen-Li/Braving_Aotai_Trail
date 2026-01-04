@@ -27,18 +27,22 @@ const mapScenes: Record<string, Scene> = {
     text: "这里是塘口村，鳌太线的起点。清晨的空气冷冽刺骨。眼前是连绵的秦岭山脉，墨绿色的冷杉林在风中低语。这一去，便是数日的无人区。",
     bg: "loc_village",
     choices: [
-      { text: "整理心情，踏上机耕路", target: "node_village_road" },
       {
-        text: "先在村口吃顿饱饭",
-        cost: { hunger: -10 },
+        text: "坐秀才家的拖拉机上山",
         target: "node_village_road",
+        cost: { hp: -2 },
+      },
+      {
+        text: "徒步前往登山口",
+        target: "node_village_road",
+        cost: { hunger: 5, hp: 5 },
       },
     ],
   },
 
   node_village_road: {
     id: "node_village_road",
-    text: "【机耕路】还是平缓的土路。你沿着河谷前行，还能看到远处农家的炊烟。这是最后的文明痕迹。背包的重量开始压在肩上。",
+    text: "机耕路尽头是登山口。告示牌醒目写着：此为国家级自然保护区，禁止入内。违者罚款100-5000元。为了安全，请立即原路返回。",
     bg: "loc_tractor_road",
     choices: [
       {
@@ -74,7 +78,7 @@ const mapScenes: Record<string, Scene> = {
 
   node_forest_entry: {
     id: "node_forest_entry",
-    text: "你正式进入了爬升路段。四周是茂密的红桦林，坡度陡然提升。呼吸开始变得急促，心跳声在耳边回响。",
+    text: "过了登山口便是火烧坡，坡上长满小杂木，开满小花，走起来还算轻松。但随着海拔爬升，呼吸开始变得急促。",
     bg: "loc_red_birch",
     choices: [
       {
@@ -107,15 +111,10 @@ const mapScenes: Record<string, Scene> = {
 
   node_2900: {
     id: "node_2900",
-    text: "终于，你到达了第一晚的落脚点。这里地势相对平坦，是一片开阔的草甸。夕阳下的秦岭美得令人窒息。",
+    text: "2900营地。通常早上出发的人中午就到这了，只有下午上山的才在此扎营。再往上走一点看到歪脖子树，就快到山脊线了。",
     bg: "loc_sunset_meadow",
     choices: [
       { text: "搭帐篷过夜", action: "rest", target: "node_2900_morning" },
-      {
-        text: "趁天色还早赶往盆景园",
-        target: "node_penjing_ascent",
-        cost: { hunger: 15, sanity: 5 },
-      },
       { text: "感觉状态不对，决定下撤", target: "end_retreat" },
     ],
   },
@@ -145,14 +144,19 @@ const mapScenes: Record<string, Scene> = {
 
   node_penjing: {
     id: "node_penjing",
-    text: "海拔3100米。这里的太白红杉因长期受大风吹袭，树冠平整如削，姿态奇异，如同天然盆景园。",
+    text: "鳌太山脊在这里拐了个大弯，向东延伸，那里是西跑马梁。这里有信号，可以给家人报个平安。",
     bg: "loc_penjing",
     choices: [
-      { text: "穿过怪树林", target: "node_baiqi_start", cost: { hunger: 10 } },
+      { text: "给家人打电话", action: "rest", target: "node_baiqi_start" },
       {
-        text: "拍照留念",
+        text: "下沟取水",
+        action: "loot_supplies",
+        cost: { hunger: 5, hp: 5 },
+      },
+      {
+        text: "继续赶路",
         target: "node_baiqi_start",
-        cost: { hunger: 10, sanity: -5 },
+        cost: { hunger: 20, hp: 10 },
       },
     ],
   },
@@ -396,14 +400,18 @@ const mapScenes: Record<string, Scene> = {
 
   node_daye_lake: {
     id: "node_daye_lake",
-    text: "翻过最后一个垭口，那抹幽蓝的湖水出现在眼前。海拔3590米的圣湖。许多人到了这里，都会忍不住落泪。",
+    text: "大爷海，海拔3590米的圣湖。喝上一瓶传说中的“大爷海可乐”，是鳌太路上最爽的时刻之一。",
     bg: "loc_daye_lake",
     choices: [
-      { text: "在湖边洗把脸", action: "rest", target: "node_baxian_ascent" },
       {
-        text: "一鼓作气冲顶",
+        text: "畅饮可乐",
+        action: "rest",
         target: "node_baxian_ascent",
-        cost: { hunger: 10 },
+      },
+      {
+        text: "补充水分，准备冲顶",
+        target: "node_baxian_ascent",
+        cost: { hunger: -5, sanity: -5 },
       },
     ],
   },
