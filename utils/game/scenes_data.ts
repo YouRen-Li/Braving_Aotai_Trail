@@ -289,10 +289,10 @@ const mapScenes: Record<string, Scene> = {
 
   node_plane_wreck: {
     id: "node_plane_wreck",
-    text: "爬上飞机梁，你看到了一些战机残骸。接下来要连续过梁：梁1、梁2、梁3。这是挑战心理的一段路。",
+    text: "爬上飞机梁，你看到了一些战机残骸和遇难山友的纪念碑。接下来要连续过三个梁。这是挑战心理的一段路。",
     bg: "loc_plane_wreck",
     choices: [
-      { text: "查看残骸", target: "node_liang1", cost: { sanity: 5 } },
+      { text: "查看残骸与纪念碑", target: "node_liang1", cost: { sanity: 5 } },
       { text: "不看，直接前往梁1", target: "node_liang1" },
     ],
   },
@@ -348,18 +348,168 @@ const mapScenes: Record<string, Scene> = {
 
   node_2800: {
     id: "node_2800",
-    text: "下午15:00，到达2800营地。这里是鳌山和太白山的分界线。树木茂密，光线阴暗，氛围略显压抑。",
+    text: "下午15:00，到达2800营地。这里被誉为“五星级营地”，地势平坦，水源在右侧松树林边。这里是鳌山和太白山的分界线。",
     bg: "loc_forest",
     choices: [
       {
         text: "扎营 (恢复体力)",
         action: "rest",
-        target: "node_fog_entry",
+        target: "node_pyramid_ascent",
       },
       {
         text: "连夜赶路 (极度危险)",
-        target: "node_fog_entry",
+        target: "node_pyramid_ascent",
         cost: { sanity: -50 },
+      },
+    ],
+  },
+
+  // === 第四章：迷途与塔石连走 (Day 4: The Towers) ===
+
+  node_pyramid_ascent: {
+    id: "node_pyramid_ascent",
+    text: "早上6:40出发。今天要“塔石连走”，强度极大。从2800营地一路拔高1.5小时，首先要翻越金字塔。",
+    bg: "loc_stone_sea",
+    choices: [
+      {
+        text: "调整呼吸，缓慢爬升",
+        target: "node_pyramid",
+        cost: { hunger: 10, hp: 5 },
+      },
+    ],
+  },
+
+  node_pyramid: {
+    id: "node_pyramid",
+    text: "金字塔顶。远眺前方，塔1两侧山体陡峭对称，形状完美。去往塔1的路主要靠右切。",
+    bg: "loc_ridge",
+    choices: [
+      {
+        text: "右切前往塔1",
+        target: "node_ta1",
+        cost: { hunger: 5 },
+      },
+    ],
+  },
+
+  node_ta1: {
+    id: "node_ta1",
+    text: "【塔1】右切路上经过一个造型奇特的岩石。很多路段只能容纳一只脚，非常难走。若遇风雨，更是雪上加霜。",
+    bg: "loc_ridge",
+    choices: [
+      {
+        text: "小心通过窄路",
+        target: "node_ta2",
+        cost: { hunger: 10, hp: 5 },
+      },
+    ],
+  },
+
+  node_ta2: {
+    id: "node_ta2",
+    text: "【塔2】到达左切路口。这里的路线最终是要登顶翻越的。",
+    bg: "loc_ridge",
+    choices: [
+      {
+        text: "登顶翻越塔2",
+        target: "node_ta3",
+        cost: { hunger: 15, hp: 5 },
+      },
+    ],
+  },
+
+  node_ta3: {
+    id: "node_ta3",
+    text: "【塔3】右切通过。路下方有好几处水源。注意：下一站西源营地大概率没水。如果打算在那里扎营，必须在此背水。",
+    bg: "loc_spring_water",
+    choices: [
+      {
+        text: "下路取水背负 (增加负重)",
+        action: "loot_supplies",
+        target: "node_xiyuan",
+        cost: { hunger: 10, hp: 5 },
+      },
+      {
+        text: "赌一把，直接去西源",
+        target: "node_xiyuan",
+        cost: { hunger: 5 },
+      },
+    ],
+  },
+
+  node_xiyuan: {
+    id: "node_xiyuan",
+    text: "到达西源营地。水源在左下方，是季节性的。果然，七月份这里干枯无水。",
+    bg: "loc_camp",
+    choices: [
+      {
+        text: "用刚才背的水扎营",
+        action: "rest",
+        target: "node_stone_sea_9",
+      },
+      {
+        text: "无水，只能强行翻越九重石海",
+        target: "node_stone_sea_9",
+        cost: { hunger: 20, sanity: -10 },
+      },
+    ],
+  },
+
+  node_stone_sea_9: {
+    id: "node_stone_sea_9",
+    text: "【九重石海】鳌太必经之路。三面石海连着太白梁，状如迎风破浪的巨舰。只能从“船头”正面硬爬。石头稳固，但极为漫长。",
+    bg: "loc_stone_sea",
+    choices: [
+      {
+        text: "一步步爬上“船头”",
+        target: "node_dashihe",
+        cost: { hunger: 20, hp: 10 },
+      },
+    ],
+  },
+
+  node_dashihe: {
+    id: "node_dashihe",
+    text: "下午18:10。翻过九重石海，经过干枯的东源，终于到达大石河营地。这里有巨大的活水，成功在望！",
+    bg: "loc_camp",
+    choices: [
+      {
+        text: "扎营狂欢",
+        action: "rest",
+        target: "node_wanxian",
+      },
+    ],
+  },
+
+  // === 第五章：朝圣与分道 (Day 5: Pilgrimage & The Split) ===
+
+  node_wanxian: {
+    id: "node_wanxian",
+    text: "早上7:18出发。经过雷公庙，开始爬升万仙阵。沿途出现了许多玛尼堆。石海路经过修整，虽然要爬升1小时，但心情格外轻松。",
+    bg: "loc_stone_sea",
+    choices: [
+      {
+        text: "向着最高峰前进",
+        target: "node_summit_fork",
+        cost: { hunger: 10, hp: 5 },
+      },
+    ],
+  },
+
+  node_summit_fork: {
+    id: "node_summit_fork",
+    text: "到达岔路口。左边直通大爷海（较近），右边先上拔仙台顶（最高峰）再下到大爷海。来都来了，怎能不登顶？",
+    bg: "loc_ridge",
+    choices: [
+      {
+        text: "右转登顶拔仙台 (圆梦)",
+        target: "node_baxiantai",
+        cost: { hunger: 10, hp: 5 },
+      },
+      {
+        text: "左转直奔大爷海 (省力)",
+        target: "node_daye_lake",
+        cost: { hunger: 5 },
       },
     ],
   },
@@ -385,31 +535,18 @@ const mapScenes: Record<string, Scene> = {
     choices: [
       {
         text: "寻找树上的红布条",
-        target: "node_pyramid",
+        target: "node_pyramid_ascent",
         cost: { hunger: 20, sanity: 5 },
       },
       {
         text: "冷静下来，观察兽道",
-        target: "node_pyramid",
+        target: "node_pyramid_ascent",
         cost: { hunger: 15, sanity: -5 },
       },
     ],
   },
 
   // === 第五章：朝圣  ===
-
-  node_pyramid: {
-    id: "node_pyramid",
-    text: "一片开阔的草甸，夕阳将云海染成金色。这里是第一天的理想营地，但风很大。",
-    bg: "loc_ridge",
-    choices: [
-      {
-        text: "翻越山侧",
-        target: "node_xitaibai",
-        cost: { hunger: 20, hp: 10 },
-      },
-    ],
-  },
 
   node_xitaibai: {
     id: "node_xitaibai",
@@ -425,42 +562,120 @@ const mapScenes: Record<string, Scene> = {
     ],
   },
 
-  node_daye_lake: {
-    id: "node_daye_lake",
-    text: "大爷海，海拔3590米的圣湖。喝上一瓶传说中的“大爷海可乐”，是鳌太路上最爽的时刻之一。",
-    bg: "loc_daye_lake",
-    choices: [
-      {
-        text: "畅饮可乐",
-        action: "rest",
-        target: "node_baxian_ascent",
-      },
-      {
-        text: "补充水分，准备冲顶",
-        target: "node_baxian_ascent",
-        cost: { hunger: -5, sanity: -5 },
-      },
-    ],
-  },
-
-  node_baxian_ascent: {
-    id: "node_baxian_ascent",
-    text: "只剩下最后一百多米的拔高。碎石坡很滑，每走一步退半步。这是最后的考验。",
-    bg: "loc_stone_sea",
-    choices: [
-      {
-        text: "燃烧最后的意志",
-        target: "node_baxiantai",
-        cost: { hunger: 15, hp: 5 },
-      },
-    ],
-  },
-
   node_baxiantai: {
     id: "node_baxiantai",
-    text: "海拔3767.2米！你站上了秦岭之巅。云海在你脚下翻腾，天地之间，只有风声和你沉重的呼吸声。",
+    text: "【拔仙台】海拔3767.2米！看着满地的残垣断壁，俯视着秦川大地。你告诉自己：梦想总会实现，一切皆有可能。",
     bg: "bg_sunny",
-    choices: [{ text: "向群山致敬，下山", target: "end_success" }],
+    choices: [{ text: "带着自豪下撤至大爷海", target: "node_daye_lake" }],
+  },
+
+  node_daye_lake: {
+    id: "node_daye_lake",
+    text: "群峰环绕的高山明珠——大爷海。这里有接待站，饭菜虽贵但能救急。喝一瓶20元的可乐，是鳌太穿越最具象征意义的仪式。",
+    bg: "loc_daye_lake",
+    choices: [
+      { text: "购买食物和可乐 (20元)", action: "rest", target: "node_wengong" }, // Abstract money as 'rest'
+      { text: "不消费，继续赶路", target: "node_wengong", cost: { hunger: 5 } },
+    ],
+  },
+
+  node_wengong: {
+    id: "node_wengong",
+    text: "通往文公庙的路已经是景区步道。到达大文公庙，队伍在此分道：直行去坐索道下山（小鳌太），左行去鹦鸽镇（大鳌太）。",
+    bg: "loc_temple",
+    choices: [
+      {
+        text: "直行：坐索道下山 (结束旅程)",
+        target: "end_success",
+      },
+      {
+        text: "左行：继续大鳌太 (前往明星寺)",
+        target: "node_fangyang",
+        cost: { hunger: 10, hp: 5 },
+      },
+    ],
+  },
+
+  node_fangyang: {
+    id: "node_fangyang",
+    text: "下山一路穿行在红杉林中。到达放羊寺，果然没找到水。还要走1.5小时才能到今天的营地。",
+    bg: "loc_forest",
+    choices: [
+      {
+        text: "咬牙坚持",
+        target: "node_mingxing",
+        cost: { hunger: 15, sanity: 5 },
+      },
+    ],
+  },
+
+  node_mingxing: {
+    id: "node_mingxing",
+    text: "下午18:00，抵达明星寺。水源在崖壁下方。今天是第五天，最艰难的时刻已经过去，明天就是出山的日子。",
+    bg: "loc_temple",
+    choices: [
+      {
+        text: "扎营，期待明天",
+        action: "rest",
+        target: "node_mingxing_morning",
+      },
+    ],
+  },
+
+  // === 第六章：出山 (Day 6: The Return) ===
+
+  node_mingxing_morning: {
+    id: "node_mingxing_morning",
+    text: "早上7:20出发。今天要走13公里，预计下午13:10到达南源村。心情格外轻松，归心似箭。",
+    bg: "loc_forest",
+    choices: [
+      {
+        text: "前往平安寺 (2小时)",
+        target: "node_pingan",
+        cost: { hunger: 5 },
+      },
+    ],
+  },
+
+  node_pingan: {
+    id: "node_pingan",
+    text: "抵达平安寺。从这里开始，一路是4小时的疯狂下坡。路太陡了，想找块平坦的地方坐下休息都难。",
+    bg: "loc_temple",
+    choices: [
+      {
+        text: "一口气冲下山",
+        target: "node_yangpi_gully",
+        cost: { hunger: 10, hp: 5 },
+      },
+    ],
+  },
+
+  node_yangpi_gully: {
+    id: "node_yangpi_gully",
+    text: "看到警示牌后，沿着“羊皮沟”的溪谷伴行。溪水潺潺，文明世界的气息越来越浓。",
+    bg: "loc_river",
+    choices: [
+      {
+        text: "走出大山",
+        target: "end_grand_success",
+      },
+    ],
+  },
+
+  end_grand_success: {
+    id: "end_grand_success",
+    text: "【出山】下午13:10，你抵达了南源村农家乐。你也终于完成了此次大鳌太穿越！接下来怎么回西安？",
+    bg: "loc_village",
+    choices: [
+      {
+        text: "包车去岐山坐动车 (快，推荐)",
+        action: "restart",
+      },
+      {
+        text: "包车去眉县坐大巴 (慢)",
+        action: "restart",
+      },
+    ],
   },
 
   // --- Endings ---
