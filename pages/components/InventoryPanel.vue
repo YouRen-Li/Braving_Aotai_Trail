@@ -295,8 +295,7 @@ const handleAction = () => {
 }
 
 .detail-area {
-    height: 220rpx;
-    background: #1a1a1a;
+    /* height: 220rpx; Removed fixed height to allow dynamic content */
     padding: 30rpx;
     border-top: 2rpx solid #333;
     display: flex;
