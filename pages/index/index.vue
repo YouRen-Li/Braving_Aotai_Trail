@@ -68,6 +68,22 @@
       <view class="footer-warning">
         <text class="warning-text">⚠ 鳌太线是中国十大死亡路线之一，请敬畏自然</text>
       </view>
+
+      <!-- Custom Modal -->
+      <view v-if="showResetModal" class="modal-overlay">
+        <view class="modal-content">
+          <text class="modal-title">重新开始</text>
+          <text class="modal-text">开始新游戏将覆盖现有存档，确定要重新开始吗？</text>
+          <view class="modal-actions">
+            <view class="modal-btn cancel" @click="cancelReset">
+              <text class="modal-btn-text">取消</text>
+            </view>
+            <view class="modal-btn confirm" @click="confirmReset">
+              <text class="modal-btn-text highlight">确定</text>
+            </view>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -104,16 +120,7 @@ onShow(() => {
 
 const handleStartHike = () => {
   if (hasSave.value) {
-    uni.showModal({
-      title: '提示',
-      content: '开始新游戏将覆盖现有存档，确定吗？',
-      success: (res) => {
-        if (res.confirm) {
-          gameStore.initGame(); // Optional pre-init or just let char select do it
-          uni.navigateTo({ url: '/pages/character/index' });
-        }
-      }
-    });
+    showResetModal.value = true;
   } else {
     // New Game -> Character Select
     uni.navigateTo({ url: '/pages/character/index' });
@@ -131,6 +138,19 @@ const handleContinueHike = () => {
 
 const handleAbout = () => {
   uni.showToast({ title: '致敬所有勇敢的攀登者', icon: 'none' });
+};
+
+// Modal Logic
+const showResetModal = ref(false);
+
+const cancelReset = () => {
+  showResetModal.value = false;
+};
+
+const confirmReset = () => {
+  showResetModal.value = false;
+  gameStore.initGame();
+  uni.navigateTo({ url: '/pages/character/index' });
 };
 </script>
 
@@ -441,5 +461,105 @@ const handleAbout = () => {
   font-size: 22rpx;
   color: rgba(255, 180, 180, 0.6);
   letter-spacing: 2rpx;
+}
+
+/* Custom Modal Styles */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8rpx);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  width: 560rpx;
+  padding: 48rpx;
+  background: rgba(30, 40, 50, 0.85);
+  border: 1rpx solid rgba(255, 255, 255, 0.15);
+  border-radius: 24rpx;
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 24rpx;
+  letter-spacing: 2rpx;
+}
+
+.modal-text {
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 48rpx;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 24rpx;
+  width: 100%;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12rpx;
+  transition: all 0.2s;
+
+  &.cancel {
+    background: rgba(255, 255, 255, 0.1);
+
+    &:active {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  &.confirm {
+    background: linear-gradient(135deg, #4a90e2, #0056b3);
+    box-shadow: 0 4rpx 16rpx rgba(74, 144, 226, 0.3);
+
+    &:active {
+      transform: scale(0.96);
+    }
+  }
+}
+
+.modal-btn-text {
+  font-size: 30rpx;
+  color: rgba(255, 255, 255, 0.8);
+
+  &.highlight {
+    color: #ffffff;
+    font-weight: 600;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 </style>

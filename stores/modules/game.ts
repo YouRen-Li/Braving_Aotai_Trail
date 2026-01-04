@@ -316,7 +316,7 @@ export const useGameStore = defineStore("game", {
           // Normal move logic
           if (choice.target.startsWith("node_")) {
             this.randomizeWeather();
-            this.status.isNight = true;
+            // this.status.isNight = true; // Fixed: Don't force night on every move
           }
           this.moveToScene(choice.target);
         }
