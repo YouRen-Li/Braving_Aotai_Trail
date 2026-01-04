@@ -356,9 +356,8 @@ export const useGameStore = defineStore("game", {
             this.nextSceneId = "";
           } else {
             console.error("No nextSceneId to resume to!");
-            this.showNotification("路径迷失，原地徘徊...", "negative");
-            // Fallback: Stay in current scene or go to a safe default if needed
-            // For now, doing nothing keeps player in current scene which is safe
+            // Fallback: Silently move to a safe main path node to prevent soft-lock
+            this.moveToScene("node_forest_entry");
           }
           return;
         }
