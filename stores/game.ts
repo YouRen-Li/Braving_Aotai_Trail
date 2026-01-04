@@ -321,7 +321,8 @@ export const useGameStore = defineStore("game", {
       }
 
       if (["storm", "snow"].includes(this.weather)) {
-        this.showNotification(`警告: ${info.name}`, "negative");
+        const weatherInfo = weatherData[this.weather];
+        this.showNotification(`警告: ${weatherInfo.name}`, "negative");
         audioManager.playBGM("wind");
       } else {
         audioManager.playBGM("sunny");
@@ -382,8 +383,16 @@ export const useGameStore = defineStore("game", {
             audioManager.playBGM("wind");
           }
 
-          this.moveToScene(eventId);
-          this.showNotification("遭遇突发事件！", "negative");
+          // [Robustness] Check if event scene exists
+          if (scenes[eventId]) {
+            this.moveToScene(eventId);
+            this.showNotification("遭遇突发事件！", "negative");
+          } else {
+            console.error(
+              `Random event scene not found: ${eventId}, falling back to normal target.`
+            );
+            this.moveToScene(choice.target);
+          }
         } else {
           // Normal move logic
           if (choice.target.startsWith("node_")) {

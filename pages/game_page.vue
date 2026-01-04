@@ -184,7 +184,11 @@ const handleTextClick = () => {
 const isProcessing = ref(false);
 
 const onChoose = (choice) => {
-
+  // 如果正在打字，先跳过动画，不执行选择
+  if (isTyping.value) {
+    skip();
+    return;
+  }
 
   if (isProcessing.value) return; // Debounce
   isProcessing.value = true;
