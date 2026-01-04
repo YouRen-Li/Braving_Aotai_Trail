@@ -6,180 +6,464 @@ export interface ChoiceCost {
 
 export interface SceneChoice {
   text: string;
-  target?: string; // Target scene ID. 'resume' means continue to original destination.
+  target?: string; // Target scene ID. 'resume' for random events.
   cost?: ChoiceCost;
-  action?: string; // Special actions: 'restart', 'rest', 'check_gear', 'trigger_storm'
+  action?: string; // Special actions: 'restart', 'rest', 'loot_supplies', 'refill_water', 'look_back'
 }
 
 export interface Scene {
   id: string;
   text: string;
   choices: SceneChoice[];
-  bg?: string; // e.g., 'forest', 'snow', 'night'
+  bg?: string;
 }
 
-// --- 真实地图节点 ---
+// --- 真实地图节点扩充版 (40+ Nodes) ---
 const mapScenes: Record<string, Scene> = {
+  // === 第一章：进山 (The Approach) ===
+
   start_001: {
     id: "start_001",
-    text: "这里是塘口，鳌太线的起点。眼前是连绵的秦岭山脉，这一去，便是数日的无人区穿越。背包沉甸甸的，你检查了最后一遍装备。",
+    text: "这里是塘口，鳌太线的起点。清晨的空气冷冽刺骨。眼前是连绵的秦岭山脉，墨绿色的冷杉林在风中低语。这一去，便是数日的无人区。",
     choices: [
-      { text: "整理心情，出发！", target: "node_2900" },
+      { text: "整理心情，踏上机耕路", target: "node_village_road" },
       {
-        text: "先在村口吃顿饱饭",
+        text: "先在村口吃顿饱饭 (饱食+10)",
         cost: { hunger: -10 },
-        target: "node_2900",
-        action: "rest",
+        target: "node_village_road",
       },
     ],
   },
+
+  node_village_road: {
+    id: "node_village_road",
+    text: "【机耕路】还是平缓的土路。你沿着河谷前行，还能看到远处农家的炊烟。这是最后的文明痕迹。背包的重量开始压在肩上。",
+    choices: [
+      {
+        text: "加快脚步热身",
+        target: "node_river_crossing",
+        cost: { hunger: 5 },
+      },
+      {
+        text: "调整背包背负系统",
+        target: "node_river_crossing",
+        cost: { hunger: 2 },
+      }, // Slightly lower cost
+    ],
+  },
+
+  node_river_crossing: {
+    id: "node_river_crossing",
+    text: "【过河】路断了，一条冰冷的溪流挡在面前。石头上结了薄薄的冰。",
+    choices: [
+      {
+        text: "踩着石头跳过去",
+        target: "node_forest_entry",
+        cost: { hunger: 5, sanity: 2 },
+      }, // Risk wet shoes?
+      {
+        text: "脱鞋涉水 (失温风险)",
+        target: "node_forest_entry",
+        cost: { hp: 5, hunger: 5 },
+      },
+    ],
+  },
+
+  node_forest_entry: {
+    id: "node_forest_entry",
+    text: "【红桦林】你正式进入了爬升路段。四周是茂密的红桦林，坡度陡然提升。呼吸开始变得急促，心跳声在耳边回响。",
+    choices: [
+      {
+        text: "保持节奏爬升",
+        target: "node_forest_climb",
+        cost: { hunger: 10, hp: 2 },
+      },
+      {
+        text: "回头看一眼山下的村庄 (理智+5)",
+        action: "look_back",
+        target: "node_forest_climb",
+        cost: { hunger: 5, sanity: -5 },
+      },
+    ],
+  },
+
+  node_forest_climb: {
+    id: "node_forest_climb",
+    text: "【林海深处】海拔上升到2600米。树木变得稀疏，空气也变得稀薄。每迈出一步都需要大口喘气。",
+    choices: [
+      { text: "咬牙坚持", target: "node_2900", cost: { hunger: 15, hp: 5 } },
+      { text: "喝口水休息一下", action: "rest", target: "node_2900" },
+    ],
+  },
+
   node_2900: {
     id: "node_2900",
-    text: "经过艰难的爬升，你到达了海拔2900米的营地。这里是进入高海拔区域前的最后一个相对舒适的休整点。四周静谧，偶尔传来鸟鸣。",
+    text: "【2900营地】终于，你到达了第一晚的落脚点。这里地势相对平坦，是一片开阔的草甸。夕阳下的秦岭美得令人窒息。",
+    choices: [
+      { text: "搭帐篷过夜", action: "rest" },
+      {
+        text: "趁天色还早赶往盆景园",
+        target: "node_penjing_ascent",
+        cost: { hunger: 15, sanity: 5 },
+      },
+      { text: "感觉状态不对，下撤", target: "end_retreat" },
+    ],
+  },
+
+  // === 第二章：脊线之上 (On the Ridge) ===
+
+  node_penjing_ascent: {
+    id: "node_penjing_ascent",
+    text: "【乱石坡】离开2900营地，路面变成了破碎的石块。这就是“石海”的雏形。脚下容易打滑，极其消耗体力。",
     choices: [
       {
-        text: "继续赶路，翻越鳌山",
-        target: "node_aoshan",
+        text: "手脚并用攀爬",
+        target: "node_penjing",
+        cost: { hunger: 20, hp: 5 },
+      },
+      { text: "使用登山杖支撑", target: "node_penjing", cost: { hunger: 15 } },
+    ],
+  },
+
+  node_penjing: {
+    id: "node_penjing",
+    text: "【盆景园】海拔3100米。这里的太白红杉因长期受大风吹袭，树冠平整如削，姿态奇异，如同天然盆景园。",
+    choices: [
+      { text: "穿过怪树林", target: "node_baiqi_start", cost: { hunger: 10 } },
+      {
+        text: "拍照留念 (理智+5)",
+        target: "node_baiqi_start",
+        cost: { hunger: 10, sanity: -5 },
+      },
+    ],
+  },
+
+  node_baiqi_start: {
+    id: "node_baiqi_start",
+    text: "【白起梁起点】树木消失了，眼前是裸露的山脊线。风声仿佛千军万马在呼啸，“白起梁”因此得名。体感温度骤降。",
+    choices: [
+      {
+        text: "拉紧冲锋衣拉链",
+        target: "node_baiqi_middle",
+        cost: { hunger: 5 },
+      },
+      {
+        text: "含一颗糖补充热量",
+        target: "node_baiqi_middle",
+        cost: { hunger: -5 },
+      },
+    ],
+  },
+
+  node_baiqi_middle: {
+    id: "node_baiqi_middle",
+    text: "【白起梁中段】漫长、枯燥、狂风。左边是万丈深渊，右边是滚滚云海。这种单调的行走最容易消磨意志。",
+    choices: [
+      {
+        text: "机械地迈步",
+        target: "node_nav_stand",
+        cost: { hunger: 20, sanity: 5 },
+      },
+      {
+        text: "大吼一声给自己壮胆",
+        target: "node_nav_stand",
+        cost: { hunger: 25, sanity: -10 },
+      },
+    ],
+  },
+
+  node_nav_stand: {
+    id: "node_nav_stand",
+    text: "【鳌山导航架】海拔3475米。这架废弃的导航架是鳌山的标志。风太大了，你甚至无法站稳。",
+    choices: [
+      {
+        text: "快速拍照后离开",
+        target: "node_maijie_descent",
+        cost: { hunger: 10, hp: 2 },
+      },
+      { text: "躲在架子下躲避一会", action: "rest" },
+    ],
+  },
+
+  // === 第三章：凶险之间 (The Danger Zone) ===
+
+  node_maijie_descent: {
+    id: "node_maijie_descent",
+    text: "【麦秸岭下撤】过了鳌山，路况突变。前方是陡峭的麦秸岭，你需要从这满是碎石的陡坡上下去。",
+    choices: [
+      {
+        text: "侧身慢下",
+        target: "node_knife_ridge",
         cost: { hunger: 15, hp: 5 },
       },
-      { text: "原地扎营休息", action: "rest" },
+      {
+        text: "屁降 (坐着滑下去)",
+        target: "node_knife_ridge",
+        cost: { hunger: 10, hp: 10 },
+      }, // Saves energy, hurts butt
     ],
   },
-  node_aoshan: {
-    id: "node_aoshan",
-    text: "这里是鳌山大梁，海拔极高，狂风呼啸。这里是事故高发地，无遮无拦的脊线让人感到自身的渺小。你需要格外小心失温。",
+
+  node_knife_ridge: {
+    id: "node_knife_ridge",
+    text: "【刀刃梁】路如其名，山脊窄得只能容下一只脚。两边都是深不见底的悬崖。一阵横风吹来，你晃了一下。",
     choices: [
       {
-        text: "顶着风快速通过",
-        target: "node_shuiwozi",
-        cost: { hunger: 20, hp: 10, sanity: 5 }, // High stress
+        text: "趴下爬过去",
+        target: "node_shuiwozi_source",
+        cost: { hunger: 20, sanity: 10 },
       },
       {
-        text: "寻找背风处稍作调整",
-        cost: { hunger: 5 },
-        target: "node_shuiwozi",
+        text: "深呼吸，快速通过",
+        target: "node_shuiwozi_source",
+        cost: { hunger: 15, sanity: 5 },
+      }, // Gamble
+    ],
+  },
+
+  node_shuiwozi_source: {
+    id: "node_shuiwozi_source",
+    text: "【寻找水源】翻过刀刃梁，你听到了流水声。在乱石堆下方，有一股细小的清泉。这是救命水。",
+    choices: [
+      {
+        text: "把水壶灌满",
+        action: "loot_supplies",
+        target: "node_shuiwozi_camp",
+      },
+      { text: "顾不上水了，先去营地", target: "node_shuiwozi_camp" },
+    ],
+  },
+
+  node_shuiwozi_camp: {
+    id: "node_shuiwozi_camp",
+    text: "【水窝子营地】这里是一个相对避风的鞍部。许多队伍会选择在这里扎营。地上有些前人留下的气罐垃圾。",
+    choices: [
+      { text: "扎营休整", action: "rest" },
+      {
+        text: "状态还行，继续",
+        target: "node_plane_wreck",
+        cost: { hunger: 10 },
+      },
+      { text: "太难了，我要下撤", target: "end_retreat" },
+    ],
+  },
+
+  // === 第四章：迷途 (Lost) ===
+
+  node_plane_wreck: {
+    id: "node_plane_wreck",
+    text: "【飞机梁】你看到了一些散落的金属碎片，那是多年前坠毁的战机残骸。这里常年大雾，仿佛是被诅咒之地。",
+    choices: [
+      { text: "查看残骸", target: "node_stone_sea", cost: { sanity: 5 } },
+      {
+        text: "双手合十，匆匆通过",
+        target: "node_stone_sea",
+        cost: { sanity: -2 },
       },
     ],
   },
-  node_shuiwozi: {
-    id: "node_shuiwozi",
-    text: "到达水窝子营地。这里是南北坡的节点。如果天气恶劣，许多队伍会选择从这里下撤。你看到地上有一些凌乱的脚印。",
+
+  node_stone_sea: {
+    id: "node_stone_sea",
+    text: "【无尽石海】眼前是没有尽头的乱石堆。每块石头都有半人高，且松动不稳。一旦卡住脚就是骨折。",
     choices: [
       {
-        text: "坚持向东，前往2800营地",
+        text: "像岩羊一样跳跃",
         target: "node_2800",
-        cost: { hunger: 20, hp: 10 },
+        cost: { hunger: 30, hp: 15 },
       },
-      { text: "身体不适，选择下撤", target: "end_retreat" },
+      {
+        text: "一步一步试探",
+        target: "node_2800",
+        cost: { hunger: 40, hp: 5 },
+      },
     ],
   },
+
   node_2800: {
     id: "node_2800",
-    text: "2800营地，树林茂密了一些。这里曾发生过惨剧，你路过一片空地，似乎感觉到一种异样的压抑感。",
+    text: "【2800营地】海拔重新降到2800米。这里树木茂密，光线阴暗。压抑的氛围让你只想尽快离开。",
     choices: [
       {
-        text: "穿越迷雾林，前往大爷海",
-        target: "node_fog_forest",
+        text: "进入前面的森林",
+        target: "node_fog_entry",
+        cost: { hunger: 10 },
+      },
+      { text: "搜索一下周围", target: "evt_tent", cost: { sanity: 5 } },
+    ],
+  },
+
+  node_fog_entry: {
+    id: "node_fog_entry",
+    text: "【迷雾入口】走进冷杉林，浓雾突然涌来，能见度瞬间降到五米以内。路迹消失了。",
+    choices: [
+      {
+        text: "拿出指北针确认方向",
+        target: "node_fog_deep",
+        cost: { sanity: -5 },
+      },
+      { text: "凭直觉走", target: "node_fog_deep", cost: { sanity: 5 } },
+    ],
+  },
+
+  node_fog_deep: {
+    id: "node_fog_deep",
+    text: "【迷魂阵】你绕回了原地？那棵枯树刚才好像见过。恐惧开始在心中蔓延。",
+    choices: [
+      {
+        text: "寻找树上的红布条",
+        target: "node_pyramid",
+        cost: { hunger: 20, sanity: 5 },
+      },
+      {
+        text: "冷静下来，观察兽道",
+        target: "node_pyramid",
+        cost: { hunger: 15, sanity: -5 },
+      },
+    ],
+  },
+
+  // === 第五章：朝圣 (Pilgrimage) ===
+
+  node_pyramid: {
+    id: "node_pyramid",
+    text: "【金字塔】雾气散去，一座金字塔般的角峰耸立在眼前。这里是太白山的南坡。",
+    choices: [
+      {
+        text: "翻越山侧",
+        target: "node_xitaibai",
+        cost: { hunger: 20, hp: 10 },
+      },
+    ],
+  },
+
+  node_xitaibai: {
+    id: "node_xitaibai",
+    text: "【西太白】这里有雷公庙的断壁残垣。古人敬畏自然，在此设庙。太白绝顶就在前方了。",
+    choices: [
+      {
+        text: "捡一块石头祭拜",
+        target: "node_daye_lake",
+        cost: { sanity: -10 },
+      },
+      { text: "继续赶路", target: "node_daye_lake", cost: { hunger: 10 } },
+    ],
+  },
+
+  node_daye_lake: {
+    id: "node_daye_lake",
+    text: "【大爷海】翻过最后一个垭口，那抹幽蓝的湖水出现在眼前。海拔3590米的圣湖。许多人到了这里，都会忍不住落泪。",
+    choices: [
+      { text: "在湖边洗把脸", action: "rest", target: "node_baxian_ascent" }, // Rest restores a lot
+      {
+        text: "一鼓作气冲顶",
+        target: "node_baxian_ascent",
+        cost: { hunger: 10 },
+      },
+    ],
+  },
+
+  node_baxian_ascent: {
+    id: "node_baxian_ascent",
+    text: "【最后的冲顶】只剩下最后一百多米的拔高。碎石坡很滑，每走一步退半步。这是最后的考验。",
+    choices: [
+      {
+        text: "燃烧最后的意志",
+        target: "node_baxiantai",
         cost: { hunger: 15, hp: 5 },
       },
-      {
-        text: "仔细搜索周围",
-        target: "evt_tent",
-        cost: { sanity: 5 }, // Searching abandoned camps is creepy
-      },
     ],
   },
-  node_fog_forest: {
-    id: "node_fog_forest",
-    text: "你进入了一片浓密的冷杉林，大雾弥漫，能见度不足5米。脚下的路若隐若现，很容易迷失方向。（这里是2800到大爷海之间的迷魂阵）",
-    choices: [
-      {
-        text: "凭直觉向前走",
-        target: "node_daye",
-        cost: { hunger: 20, sanity: 15 }, // High stress to be lost
-      },
-      {
-        text: "仔细辨认路标 (消耗精力)",
-        target: "node_daye",
-        cost: { hunger: 25, hp: 5, sanity: 5 },
-      },
-    ],
+
+  node_baxiantai: {
+    id: "node_baxiantai",
+    text: "【拔仙台】海拔3767.2米！你站上了秦岭之巅。云海在你脚下翻腾，天地之间，只有风声和你沉重的呼吸声。",
+    choices: [{ text: "向群山致敬，下山", target: "end_success" }],
   },
-  node_daye: {
-    id: "node_daye",
-    text: "大爷海，秦岭之巅的圣湖。湖水幽蓝深邃。翻过前面的拔仙台，就是出山的路了。",
-    choices: [
-      {
-        text: "一鼓作气，出山！",
-        target: "end_success",
-        cost: { hunger: 30, hp: 20 },
-      },
-      { text: "在湖边最后休整一夜", action: "rest" },
-    ],
-  },
+
+  // --- Endings ---
   end_success: {
     id: "end_success",
-    text: "终于，你看到了鹦鸽镇的灯火。你成功完成了鳌太线穿越！回首望去，群山已在身后，活着真好。",
+    text: "顺着游人如织的台阶路下山，你恍如隔世。你满身泥泞，在游客惊讶的目光中走出了大山。你活着，并且战胜了自己。",
+    bg: "sunny",
     choices: [{ text: "再来一次", action: "restart" }],
   },
   end_retreat: {
     id: "end_retreat",
-    text: "你明智地选择了下撤。山永远在那里，生命只有一次。虽然没有走完全程，但安全回家才是户外的终点。",
+    text: "【结局：明智撤退】山永远在那里，生命只有一次。你选择了下撤。虽然通过了，但安全回家才是户外的终点。",
     choices: [{ text: "重新开始", action: "restart" }],
   },
   dead_001: {
     id: "dead_001",
-    text: "你的意识逐渐模糊... 在这片无人区，你成为了大山的一部分。",
+    text: "【结局：长眠大山】你的意识逐渐模糊... 身体不再寒冷，反而感到一丝温暖。在这片无人区，你成为了大山的一部分。",
+    choices: [{ text: "重新开始", action: "restart" }],
+  },
+  dead_starve: {
+    id: "dead_starve",
+    text: "【结局：饥寒交迫】食物耗尽，体力透支。你倒在了路上，再也没有力气站起来。",
+    choices: [{ text: "重新开始", action: "restart" }],
+  },
+  dead_cold: {
+    id: "dead_cold",
+    text: "【结局：失温】核心体温降低，你开始出现幻觉，感到异常燥热而脱去了衣服... 最后的微笑凝固在嘴角。",
+    choices: [{ text: "重新开始", action: "restart" }],
+  },
+  dead_sanity: {
+    id: "dead_sanity",
+    text: "【结局：精神崩溃】无尽的黑暗和风声击垮了你的意志。你开始胡言乱语，冲向了悬崖...",
     choices: [{ text: "重新开始", action: "restart" }],
   },
   end_caught: {
     id: "end_caught",
-    text: "【结局：被捕】你被巡山队带回了派出所。写下保证书，缴纳3000元罚款，并被列入黑名单。这一趟“非法穿越”终究以闹剧收场。",
+    text: "【结局：被捕】你被巡山队带回了派出所。写下保证书，缴纳罚款，并被列入黑名单。这一趟“非法穿越”终究以闹剧收场。",
     choices: [{ text: "接受教训，重新开始", action: "restart" }],
+  },
+  end_rescue: {
+    id: "end_rescue",
+    text: "【结局：获救】只有亲历者才知道等待救援的那十几个小时有多绝望。获救了，但“驴友”的名声又多了一笔负面教材。",
+    choices: [{ text: "重新开始", action: "restart" }],
   },
 };
 
-// --- 随机事件 (基于真实案例) ---
+// --- 随机事件 ---
 const eventScenes: Record<string, Scene> = {
   evt_hiker: {
     id: "evt_hiker",
     text: "【随机事件】浓雾中，你隐约听到前方有呼救声。走近一看，是一个眼神涣散的落单驴友。他说同伴走丢了，自己也没水了。",
     choices: [
       {
-        text: "分他半瓶水，指引方向",
-        cost: { hunger: 10, sanity: -5 },
+        text: "分他半瓶水",
+        cost: { hunger: 10, sanity: -10 },
         target: "resume",
-      }, // Helping others restores sanity
-      { text: "自身难保，默默离开", cost: { sanity: 10 }, target: "resume" }, // Guilt
+      }, // +Karma
+      { text: "自身难保，离开", cost: { sanity: 10 }, target: "resume" }, // Guilt
       {
-        text: "帮他报警(消耗大量时间等待)",
-        cost: { hp: 20, hunger: 20, sanity: -10 }, // Good deed
+        text: "帮他报警",
+        cost: { hp: 20, hunger: 20, sanity: -5 },
         target: "resume",
       },
     ],
   },
   evt_tent: {
     id: "evt_tent",
-    text: "【随机事件】你发现一顶完好的帐篷搭在路边，但没有任何动静。走近时，心里涌起一股不祥的预感。",
+    text: "【探索】你发现一顶完好的帐篷搭在路边，但没有任何动静。走近时，心里涌起一股不祥的预感。",
     choices: [
       { text: "拉开帐篷查看", target: "evt_tent_result", cost: { sanity: 5 } },
-      { text: "多一事不如少一事，离开", target: "node_2800" },
+      { text: "多一事不如少一事，离开", target: "resume" },
     ],
   },
   evt_tent_result: {
     id: "evt_tent_result",
     text: "帐篷里空无一人，只有一些散落的气罐和睡袋。看来主人已经离开许久了。你捡起了一些可用的物资。",
-    choices: [
-      { text: "获得物资", target: "node_2800", action: "loot_supplies" },
-    ],
+    choices: [{ text: "获得物资", target: "resume", action: "loot_supplies" }],
   },
   evt_storm: {
     id: "evt_storm",
-    text: "【突发恶劣天气】狂风骤起，暴雪瞬间吞没了视线！这是最危险的时刻（参考2017年及2021年多起事故）。强行赶路极易失温死亡。",
+    text: "【突发恶劣天气】狂风骤起，暴雪瞬间吞没了视线！这是最危险的时刻。强行赶路极易失温死亡。",
     choices: [
       {
         text: "强行突围",
-        cost: { hp: 40, hunger: 20, sanity: 10 },
+        cost: { hp: 40, hunger: 20, sanity: 15 },
         target: "resume",
       },
       {
@@ -192,48 +476,35 @@ const eventScenes: Record<string, Scene> = {
   },
   evt_ranger: {
     id: "evt_ranger",
-    text: "【突发事件】前方路口出现了几个穿迷彩服的身影——是自然保护区的巡山队！鳌太线早已全线封禁，你这是在非法穿越。",
+    text: "【突发事件】前方路口出现了几个穿迷彩服的身影——是自然保护区的巡山队！鳌太线全线封禁，你这是在非法穿越。",
     choices: [
       { text: "配合执法，接受处罚", target: "end_caught" },
       {
         text: "趁雾大，冒险绕路躲避",
-        cost: { hp: 30, hunger: 30, sanity: 10 },
+        cost: { hp: 30, hunger: 30, sanity: 15 },
         target: "resume",
       },
     ],
   },
   evt_body: {
     id: "evt_body",
-    text: "【恐怖发现】在一块巨石的缝隙中，你发现了一具蜷缩的遗体。他衣着单薄，似乎生前有“反常脱衣”现象，头部拼命往石缝里钻（终末挖洞行为）。这残酷的一幕让你不寒而栗。",
+    text: "【恐怖发现】在一块巨石的缝隙中，你发现了一具蜷缩的遗体。他衣着单薄，似乎生前有“反常脱衣”现象。这残酷的一幕让你不寒而栗。",
     choices: [
-      {
-        text: "搜寻遗物 (获得物资，折损理智)",
-        action: "loot_supplies",
-        target: "resume",
-      }, // Cost handled in action
-      {
-        text: "默哀三分钟，继续赶路",
-        cost: { hunger: 5, sanity: 5 },
-        target: "resume",
-      }, // Still scary
+      { text: "搜寻遗物 (理智-20)", action: "loot_supplies", target: "resume" },
+      { text: "默哀并离开", cost: { hunger: 5, sanity: 10 }, target: "resume" },
     ],
   },
   evt_takin: {
     id: "evt_takin",
-    text: "【猛兽挡道】一头体型硕大的秦岭羚牛挡在了必经之路上。它盯着你，鼻孔喷着白气。这种独行公牛脾气暴躁，极具攻击性。",
+    text: "【猛兽挡道】一头体型硕大的秦岭羚牛挡在了由独木桥上。它盯着你，鼻孔喷着白气。这种独行公牛极具攻击性。",
     choices: [
       {
-        text: "原地不动，等待它离开",
-        cost: { hunger: 15, sanity: 5 },
+        text: "原地不动等待",
+        cost: { hunger: 20, sanity: 5 },
         target: "resume",
       },
       { text: "大声驱赶", cost: { hp: 50, sanity: 10 }, target: "resume" },
     ],
-  },
-  end_rescue: {
-    id: "end_rescue",
-    text: "你拨通了救援电话。十几个小时后，救援队把你抬下了山。虽然获救，但正如新闻所说：“这是一场不必要的冒险”。",
-    choices: [{ text: "重新开始", action: "restart" }],
   },
 };
 

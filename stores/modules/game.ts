@@ -417,7 +417,17 @@ export const useGameStore = defineStore("game", {
           uni.showToast({ title: "获得物资 (理智-10)", icon: "none" });
           break;
         case "check_gear":
-          uni.showToast({ title: "请打开右上角背包查看", icon: "none" });
+          uni.showToast({ title: "背包状态良好，暂无异常", icon: "none" });
+          break;
+        case "look_back":
+          this.status.sanity = Math.min(
+            this.status.maxSanity,
+            this.status.sanity + 5
+          );
+          uni.showToast({
+            title: "回望来路，内心平静了一些 (理智+5)",
+            icon: "none",
+          });
           break;
         default:
           console.warn("Unknown action:", action);
